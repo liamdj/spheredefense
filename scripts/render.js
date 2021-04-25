@@ -2,8 +2,9 @@ import { TrackballControls } from "./TrackBallControls.js";
 import { triangles } from "./objects/triangles.js";
 import { board } from "./objects/board.js";
 import { towers } from "./objects/towers.js";
+import { troops } from "./objects/troops.js";
 
-const objects = [...towers, ...triangles, board];
+const objects = [...towers, ...triangles, board, ...troops];
 
 let perspectiveCamera, controls, scene, renderer, cameraLight;
 
