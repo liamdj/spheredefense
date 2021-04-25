@@ -1,75 +1,96 @@
-import {TrackballControls} from './TrackBallControls.js';
+import { TrackballControls } from "./TrackBallControls.js";
+import { triangles } from "./objects/triangles.js";
+import { board } from "./objects/board.js";
+import { towers } from "./objects/towers.js";
 
-const scene = new THREE.Scene();
+const objects = [...towers, ...triangles, board];
 
-// Init camera (fov, aspect ratio, near, far)
+let perspectiveCamera, controls, scene, renderer, cameraLight;
+
 const container = document.getElementById("viewcontainer");
 const [width, height] = [container.clientWidth, container.clientHeight];
 
-const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+init();
+animate();
 
-// Init renderer; attach to HTML canvas
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(width, height);
-container.appendChild(renderer.domElement);
+function init() {
+  const aspect = width / height;
 
-// Many lighting solutions in ThreeJS
-// point lights, directional lights, etc.
-const light = new THREE.HemisphereLight(
-  0xffffbb, // sky color
-  0x080820, // ground color
-  1 // intensity
-);
-scene.add(light);
+  perspectiveCamera = new THREE.PerspectiveCamera(60, aspect, 1, 1000);
+  perspectiveCamera.position.z = 500;
 
-// all objects must have a function 'obj.update = (time) => <do something>;
-import { board } from "./world.js";
-import { cubes } from "./cubes.js";
-const objects = [...cubes, board];
+  // world
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x1c1c1c);
+  scene.fog = new THREE.FogExp2(0x1c1c1c, 0.001);
 
-objects.forEach((object) => scene.add(object));
+  // objects
+  objects.forEach((object) => scene.add(object));
 
-// Add mouse controls
-const controls = new TrackballControls(camera, renderer.domElement);
-controls.addEventListener('start', () => console.log("Controls Change"));
-controls.enableZoom = true;
-controls.autoRotate = true;
-controls.rotateSpeed = 1.0;
+  // lights
+  cameraLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  cameraLight.position.set(
+    perspectiveCamera.position.x,
+    perspectiveCamera.position.y,
+    perspectiveCamera.position.z
+  );
+  cameraLight.target.position.set(0, 0, 0);
+  scene.add(cameraLight);
 
-// Window resize event handler
-const resizeHandler = () => {
-    // Grab new width and heights
-    const [width, height] = [window.innerWidth, window.innerHeight];
-    renderer.setSize(width, height);
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-  };
-  
-  // Add to resize event listener
-  window.addEventListener("resize", resizeHandler, false);
-  
-//   // Set up the raytracer for clicking
-//   window.addEventListener("mousemove", onMouseMove, false);
-//   renderer.raycaster = new THREE.Raycaster();
-//   renderer.mouse = new THREE.Vector2();
-  
-//   // calculate mouse position in normalized device coordinates
-//   // (-1 to +1) for both components
-//   function onMouseMove( event ) {
-//       renderer.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-//       renderer.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-//   }
+  const ambientLight = new THREE.AmbientLight(0x222222);
+  scene.add(ambientLight);
 
-// Animation
-const renderLoop = (timeMs) => {
+  // renderer
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(width, height);
+  container.appendChild(renderer.domElement);
+  //
+
+  window.addEventListener("resize", onWindowResize);
+
+  createControls(perspectiveCamera);
+}
+
+function createControls(camera) {
+  controls = new TrackballControls(camera, renderer.domElement);
+
+  controls.rotateSpeed = 1.0;
+  controls.zoomSpeed = 1.2;
+  controls.panSpeed = 0.8;
+
+  controls.keys = ["KeyA", "KeyS", "KeyD"];
+}
+
+function onWindowResize() {
+  const aspect = window.innerWidth / window.innerHeight;
+
+  perspectiveCamera.aspect = aspect;
+  perspectiveCamera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  controls.handleResize();
+}
+
+function animate(timeMs) {
   const time = timeMs * 0.0001;
-  requestAnimationFrame(renderLoop);
-  objects.forEach((object, index) => {
-    object.update(time);
-  });
+  requestAnimationFrame(animate);
+
+  objects.forEach((object) => object.timeStep(time));
+  cameraLight.position.set(
+    perspectiveCamera.position.x,
+    perspectiveCamera.position.y,
+    perspectiveCamera.position.z
+  );
+
   controls.update();
+
+  render();
+}
+
+function render() {
+  const camera = perspectiveCamera;
+
   renderer.render(scene, camera);
-  
-};
-// Set callback to begin animation
-requestAnimationFrame(renderLoop);
+}

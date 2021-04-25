@@ -22,6 +22,13 @@ If editing the scripts, run the following to prettify them:
 npm run-script pretty
 ```
 
+## Code Structure
+World parameters are set in the index.html file to allow global visibility across javascript files.
+
+Animation, rendering, lighting, and camera controls are all established in render.js
+
+Object files are all in the object directory under scripts.
+
 ## Contributing
 The main branch is a protected branch, and pull requests are required to push to it.
 Feel free to fork and create your own branch, however, and develop there in the meantime.
