@@ -1,7 +1,7 @@
 # Sphere Defense
 ### 3D Tower defense game
 
-#### Authored by Nathan Alam and Liam Johannson
+#### Authored by Nathan Alam and Liam Johansson
 In fulfillment of Princeton's COS 426 Final Project
 
 ## Demo
