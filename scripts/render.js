@@ -1,11 +1,8 @@
-// Find the latest version by visiting https://cdn.skypack.dev/three.
-import * as THREE from "https://cdn.skypack.dev/pin/three@v0.128.0-FqqdQBPsDVJuf7F4I6W0/mode=imports/optimized/three.js";
 const scene = new THREE.Scene();
 
 // Init camera (fov, aspect ratio, near, far)
 const container = document.getElementById("viewcontainer");
 const [width, height] = [container.clientWidth, container.clientHeight];
-console.log(container);
 
 const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
 
@@ -23,26 +20,18 @@ const light = new THREE.HemisphereLight(
 );
 scene.add(light);
 
-// width, height, depth
-const cubeGeo = new THREE.BoxGeometry(1, 1, 1);
-const redMat = new THREE.MeshPhongMaterial({ color: 0xdd2244 });
-const c1 = new THREE.Mesh(cubeGeo, redMat);
-c1.position.set(-2, 0, -5);
-scene.add(c1);
-const c2 = new THREE.Mesh(cubeGeo, redMat);
-c2.position.set(+2, 0, -5);
-scene.add(c2);
-const cubes = [c1, c2];
+// all objects must have a function 'obj.update = (time) => <do something>;
+import { cubes } from "./cubes.js";
+const objects = [...cubes];
 
-// Animation Attempt #4 Adaption
+objects.forEach((object) => scene.add(object));
+
+// Animation
 const renderLoop = (timeMs) => {
   const time = timeMs * 0.0001;
   requestAnimationFrame(renderLoop);
-  cubes.forEach((cube, index) => {
-    const speed = 1 + index * 0.1;
-    const rot = time * speed;
-    cube.rotation.x = rot;
-    cube.rotation.y = rot;
+  objects.forEach((object, index) => {
+    object.update(time);
   });
   renderer.render(scene, camera);
 };
