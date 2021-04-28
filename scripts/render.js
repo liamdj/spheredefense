@@ -1,12 +1,28 @@
 import { TrackballControls } from "./TrackBallControls.js";
 import { triangles } from "./objects/triangles.js";
-import { board } from "./objects/board.js";
-import { towers } from "./objects/towers.js";
+import { board, tileLines } from "./objects/board.js";
+import { selectionLines } from "./objects/selection.js";
+import { tower } from "./objects/tower.js";
 import { troops } from "./objects/troops.js";
 
-const objects = [...towers, ...triangles, board, ...troops];
+const selectLines = selectionLines[0];
+const selectFace = selectionLines[1];
+const objects = [
+  ...triangles,
+  board,
+  tileLines,
+  ...troops,
+  ...tower,
+  ...selectionLines,
+];
 
-let perspectiveCamera, controls, scene, renderer, cameraLight;
+let perspectiveCamera,
+  controls,
+  scene,
+  renderer,
+  cameraLight,
+  raycaster,
+  pointer;
 
 const container = document.getElementById("viewcontainer");
 const [width, height] = [container.clientWidth, container.clientHeight];
@@ -49,8 +65,14 @@ function init() {
   //
 
   window.addEventListener("resize", onWindowResize);
+  window.addEventListener("pointermove", onPointerMove);
+  window.addEventListener("click", onClick);
 
   createControls(perspectiveCamera);
+
+  raycaster = new THREE.Raycaster();
+
+  pointer = new THREE.Vector2();
 }
 
 function createControls(camera) {
@@ -73,6 +95,39 @@ function onWindowResize() {
 
   controls.handleResize();
 }
+function onPointerMove(event) {
+  pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+  pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+}
+
+function onClick(event) {
+  const camera = perspectiveCamera;
+
+  raycaster.setFromCamera(pointer, camera);
+
+  const intersects = raycaster.intersectObject(board);
+
+  if (intersects.length > 0) {
+    const intersect = intersects[0];
+    const face = intersect.face;
+
+    const linePosition = selectFace.geometry.attributes.position;
+    const meshPosition = board.geometry.attributes.position;
+
+    linePosition.copyAt(0, meshPosition, face.a);
+    linePosition.copyAt(1, meshPosition, face.b);
+    linePosition.copyAt(2, meshPosition, face.c);
+    linePosition.copyAt(3, meshPosition, face.a);
+
+    board.updateMatrix();
+
+    selectFace.geometry.applyMatrix4(board.matrix);
+
+    selectFace.visible = true;
+  } else {
+    selectFace.visible = false;
+  }
+}
 
 function animate(timeMs) {
   const time = timeMs * 0.0001;
@@ -92,6 +147,31 @@ function animate(timeMs) {
 
 function render() {
   const camera = perspectiveCamera;
+
+  raycaster.setFromCamera(pointer, camera);
+
+  const intersects = raycaster.intersectObject(board);
+
+  if (intersects.length > 0) {
+    const intersect = intersects[0];
+    const face = intersect.face;
+
+    const linePosition = selectLines.geometry.attributes.position;
+    const meshPosition = board.geometry.attributes.position;
+
+    linePosition.copyAt(0, meshPosition, face.a);
+    linePosition.copyAt(1, meshPosition, face.b);
+    linePosition.copyAt(2, meshPosition, face.c);
+    linePosition.copyAt(3, meshPosition, face.a);
+
+    board.updateMatrix();
+
+    selectLines.geometry.applyMatrix4(board.matrix);
+
+    selectLines.visible = true;
+  } else {
+    selectLines.visible = false;
+  }
 
   renderer.render(scene, camera);
 }

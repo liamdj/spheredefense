@@ -17,4 +17,4 @@ let getObj = () => {
   tower2.timeStep = (time) => {};
   return [tower1, tower2];
 };
-export const towers = getObj();
+export const tower = getObj();
