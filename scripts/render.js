@@ -1,6 +1,6 @@
 import { TrackballControls } from "./TrackBallControls.js";
 import { triangles } from "./objects/triangles.js";
-import { board, tileLines } from "./objects/board.js";
+import { board, tileLines, tiles, faceToTile } from "./objects/board.js";
 import { selectionLines } from "./objects/selection.js";
 import { tower } from "./objects/tower.js";
 import { troops } from "./objects/troops.js";
@@ -109,15 +109,15 @@ function onClick(event) {
 
   if (intersects.length > 0) {
     const intersect = intersects[0];
-    const face = intersect.face;
+    const tile = tiles[faceToTile[intersect.faceIndex]];
 
     const linePosition = selectFace.geometry.attributes.position;
     const meshPosition = board.geometry.attributes.position;
 
-    linePosition.copyAt(0, meshPosition, face.a);
-    linePosition.copyAt(1, meshPosition, face.b);
-    linePosition.copyAt(2, meshPosition, face.c);
-    linePosition.copyAt(3, meshPosition, face.a);
+    linePosition.copyAt(0, meshPosition, tile.a);
+    linePosition.copyAt(1, meshPosition, tile.b);
+    linePosition.copyAt(2, meshPosition, tile.c);
+    linePosition.copyAt(3, meshPosition, tile.a);
 
     board.updateMatrix();
 
@@ -154,15 +154,14 @@ function render() {
 
   if (intersects.length > 0) {
     const intersect = intersects[0];
-    const face = intersect.face;
-
+    const tile = tiles[faceToTile[intersect.faceIndex]];
     const linePosition = selectLines.geometry.attributes.position;
     const meshPosition = board.geometry.attributes.position;
 
-    linePosition.copyAt(0, meshPosition, face.a);
-    linePosition.copyAt(1, meshPosition, face.b);
-    linePosition.copyAt(2, meshPosition, face.c);
-    linePosition.copyAt(3, meshPosition, face.a);
+    linePosition.copyAt(0, meshPosition, tile.a);
+    linePosition.copyAt(1, meshPosition, tile.b);
+    linePosition.copyAt(2, meshPosition, tile.c);
+    linePosition.copyAt(3, meshPosition, tile.a);
 
     board.updateMatrix();
 
