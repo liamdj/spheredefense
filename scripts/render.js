@@ -4,6 +4,7 @@ import { board, tileLines, tiles, faceToTile } from "./objects/board.js";
 import { selectionLines } from "./objects/selection.js";
 import { tower } from "./objects/tower.js";
 import { troops } from "./objects/troops.js";
+import { turret } from "./objects/turret.js";
 
 const selectLines = selectionLines[0];
 const selectFace = selectionLines[1];
@@ -22,7 +23,11 @@ let perspectiveCamera,
   renderer,
   cameraLight,
   raycaster,
-  pointer;
+  selectedTile,
+  pointer,
+  turretCount;
+
+turretCount = 0;
 
 const container = document.getElementById("viewcontainer");
 const [width, height] = [container.clientWidth, container.clientHeight];
@@ -111,19 +116,58 @@ function onClick(event) {
     const intersect = intersects[0];
     const tile = tiles[faceToTile[intersect.faceIndex]];
 
-    const linePosition = selectFace.geometry.attributes.position;
-    const meshPosition = board.geometry.attributes.position;
+    if (tile.selected) {
+      tile.selected = false;
+      selectedTile = undefined;
+      selectFace.visible = false;
+    } else {
+      tile.selected = true;
+      selectedTile = faceToTile[intersect.faceIndex];
 
-    linePosition.copyAt(0, meshPosition, tile.a);
-    linePosition.copyAt(1, meshPosition, tile.b);
-    linePosition.copyAt(2, meshPosition, tile.c);
-    linePosition.copyAt(3, meshPosition, tile.a);
+      // draw the selected tile highlight
+      const linePosition = selectFace.geometry.attributes.position;
+      const meshPosition = board.geometry.attributes.position;
 
-    board.updateMatrix();
+      linePosition.copyAt(0, meshPosition, tile.a);
+      linePosition.copyAt(1, meshPosition, tile.b);
+      linePosition.copyAt(2, meshPosition, tile.c);
+      linePosition.copyAt(3, meshPosition, tile.a);
 
-    selectFace.geometry.applyMatrix4(board.matrix);
+      board.updateMatrix();
+      selectFace.geometry.applyMatrix4(board.matrix);
+      selectFace.visible = true;
 
-    selectFace.visible = true;
+      if (tile.turret) {
+        scene.remove(tile.turret);
+        tile.turret = undefined;
+        turretCount -= 1;
+      } else {
+        if (turretCount < settings.MAX_TURRETS) {
+          const turretPos = {
+            x:
+              (meshPosition.getX(tile.a) +
+                meshPosition.getX(tile.b) +
+                meshPosition.getX(tile.c)) /
+              3,
+            y:
+              (meshPosition.getY(tile.a) +
+                meshPosition.getY(tile.b) +
+                meshPosition.getY(tile.c)) /
+              3,
+            z:
+              (meshPosition.getZ(tile.a) +
+                meshPosition.getZ(tile.b) +
+                meshPosition.getZ(tile.c)) /
+              3,
+          };
+          const newTurret = turret(turretPos, intersect.face.normal);
+          tile.turret = newTurret;
+          scene.add(newTurret);
+          objects.push(newTurret);
+          turretCount += 1;
+        }
+      }
+    }
   } else {
     selectFace.visible = false;
   }

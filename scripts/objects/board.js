@@ -26,6 +26,7 @@ let getObj = () => {
       b: sphereGeo.index.array[index + 1],
       c: sphereGeo.index.array[index + 2],
       selected: false,
+      turret: undefined,
     });
   }
 
