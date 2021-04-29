@@ -11,6 +11,7 @@ export const troop = (tile) => {
   troop.tile = tile;
   troop.moving = true;
   troop.speed = 0.1;
+  troop.health = 100;
 
   // animate tile to tile movement
   troop.timeStep = (time) => {

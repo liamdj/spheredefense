@@ -1,7 +1,7 @@
 export const turret = (tile, normal) => {
   const position = tile.centroid;
 
-  const geometry = new THREE.CylinderGeometry(10, 10, 40, 32);
+  const geometry = new THREE.CylinderGeometry(5, 4, 5, 32);
   const material = new THREE.MeshBasicMaterial({
     color: settings.TEAM_1_COLOR,
   });
@@ -29,10 +29,23 @@ export const turret = (tile, normal) => {
 
   turret.timeStep = (time) => {
     if (turret.moving) {
-      turret.position.set(turret.toPos.x, turret.toPos.y, turret.toPos.z);
-      turret.moving = false;
-      turret.fromTile.turret = undefined;
-      turret.toTile.turret = turret;
+      // move towards its tile
+      const step = new THREE.Vector3(
+        turret.toTile.centroid.x - turret.position.x,
+        turret.toTile.centroid.y - turret.position.y,
+        turret.toTile.centroid.z - turret.position.z
+      );
+      if (step.length() < 0.1) {
+        turret.moving = false;
+        turret.fromTile.turret = undefined;
+        turret.toTile.turret = turret;
+      }
+      step.normalize().multiplyScalar(turret.speed);
+      turret.position.set(
+        step.x + turret.position.x,
+        step.y + turret.position.y,
+        step.z + turret.position.z
+      );
     }
   };
   return turret;
