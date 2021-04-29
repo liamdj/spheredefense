@@ -18,6 +18,7 @@
             <h4>Nathan Alam & Liam Johansson</h4>
         </div>
         <div id="viewcontainer"></div>
+        <p>Score: <span id="score">0</span></p>
         <!--Import relevant scripts-->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous"></script>
         <script type='text/javascript'>
@@ -28,6 +29,10 @@
                 MAX_TURRETS: 5,
                 ENEMEY_SPEED: 0.1,
                 SPAWN_FREQUENCY: 0.005
+            }
+            var stats = {
+                score: 0,
+                gameover: false
             }
         </script>
         <script type="module" src="scripts/render.js"></script>

@@ -9,6 +9,8 @@ export const tower = (tile) => {
   });
   const tower = new THREE.Mesh(geometry, material);
   tower.position.set(position.x, position.y, position.z);
+  tower.type = "TOWER";
+  tower.health = 1000;
   // tower.rotateX(Math.PI * normal.x);
   // tower.rotateY(Math.PI * normal.y);
   // tower.rotateZ(Math.PI * normal.z);

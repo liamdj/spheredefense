@@ -18,6 +18,9 @@ export const turret = (tile, normal) => {
   turret.toTile = undefined;
   turret.fromPos = turret.position;
   turret.fromTile = tile;
+  turret.type = "TURRET";
+  turret.range = 50;
+  turret.damage = 0.1;
 
   turret.moveFromTo = (fromTile, toTile) => {
     turret.fromPos = fromTile.centroid;

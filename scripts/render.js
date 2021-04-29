@@ -1,3 +1,4 @@
+import { handleCollisions } from "./utils.js";
 import { TrackballControls } from "./TrackBallControls.js";
 import { triangles } from "./objects/triangles.js";
 import { board, tileLines, tiles, faceToTile } from "./objects/board.js";
@@ -8,7 +9,7 @@ import { turret } from "./objects/turret.js";
 
 const selectLines = selectionLines[0];
 const selectFace = selectionLines[1];
-const objects = [
+let objects = [
   ...triangles,
   board,
   tileLines,
@@ -227,13 +228,19 @@ function animate(timeMs) {
   const time = timeMs * 0.0001;
   requestAnimationFrame(animate);
 
-  objects.forEach((object) => object.timeStep(time));
+  objects.forEach((object) => {
+    object.timeStep(time);
+  });
   cameraLight.position.set(
     perspectiveCamera.position.x,
     perspectiveCamera.position.y,
     perspectiveCamera.position.z
   );
-  handleEnemyBehavior(timeMs, tiles, scene, objects);
+  // game logic
+  if (!stats.gameover) {
+    handleEnemyBehavior(timeMs, tiles, scene, objects);
+    handleCollisions(objects, scene, score);
+  }
 
   controls.update();
 

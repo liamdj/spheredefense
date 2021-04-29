@@ -12,6 +12,9 @@ export const troop = (tile) => {
   troop.moving = true;
   troop.speed = 0.1;
   troop.health = 100;
+  troop.type = "TROOP";
+  troop.range = 10;
+  troop.damage = 10;
 
   // animate tile to tile movement
   troop.timeStep = (time) => {
@@ -41,7 +44,6 @@ export const troop = (tile) => {
       });
       troop.tile = closestTile;
       troop.moving = true;
-      console.log("moving");
     }
   };
 
