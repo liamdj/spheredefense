@@ -31,6 +31,7 @@ turretCount = 0;
 
 const container = document.getElementById("viewcontainer");
 const [width, height] = [container.clientWidth, container.clientHeight];
+let adjLines = [];
 
 init();
 animate();
@@ -113,15 +114,36 @@ function onClick(event) {
   const intersects = raycaster.intersectObject(board);
 
   if (intersects.length > 0) {
+    // hit a tile
     const intersect = intersects[0];
     const tile = tiles[faceToTile[intersect.faceIndex]];
 
     if (tile.selected) {
+      // already highlighted
+
+      if (tile.turret) {
+        // clicked again on existing turret
+        scene.remove(tile.turret);
+        tile.turret = undefined;
+        turretCount -= 1;
+      } else {
+        // clicked again on empty space
+        if (turretCount < settings.MAX_TURRETS) {
+          const meshPosition = board.geometry.attributes.position;
+          const newTurret = turret(tile, meshPosition, intersect.face.normal);
+          tile.turret = newTurret;
+          scene.add(newTurret);
+          objects.push(newTurret);
+          turretCount += 1;
+        }
+      }
       tile.selected = false;
       selectedTile = undefined;
       selectFace.visible = false;
+      clearHighlights();
     } else {
       tile.selected = true;
+      const prevTile = selectedTile;
       selectedTile = faceToTile[intersect.faceIndex];
 
       // draw the selected tile highlight
@@ -133,44 +155,74 @@ function onClick(event) {
       linePosition.copyAt(2, meshPosition, tile.c);
       linePosition.copyAt(3, meshPosition, tile.a);
 
+      if (tile.turret) {
+        // show adjacent tiles
+        tile.adjacents.forEach((adjTile, adjInd) => {
+          if (tiles[adjTile].turret === undefined) {
+            tiles[adjTile].available = true;
+            const v1 = new THREE.Vector3(
+              meshPosition.getX(tiles[adjTile].a),
+              meshPosition.getY(tiles[adjTile].a),
+              meshPosition.getZ(tiles[adjTile].a)
+            );
+            const v2 = new THREE.Vector3(
+              meshPosition.getX(tiles[adjTile].b),
+              meshPosition.getY(tiles[adjTile].b),
+              meshPosition.getZ(tiles[adjTile].b)
+            );
+            const v3 = new THREE.Vector3(
+              meshPosition.getX(tiles[adjTile].c),
+              meshPosition.getY(tiles[adjTile].c),
+              meshPosition.getZ(tiles[adjTile].c)
+            );
+            const newGeometry = new THREE.BufferGeometry();
+            const vertices = new Float32Array([
+              v1.x,
+              v1.y,
+              v1.z,
+              v2.x,
+              v2.y,
+              v2.z,
+              v3.x,
+              v3.y,
+              v3.z,
+            ]);
+            newGeometry.setAttribute(
+              "position",
+              new THREE.BufferAttribute(vertices, 3)
+            );
+            const adjLine = new THREE.Mesh(
+              newGeometry,
+              new THREE.MeshBasicMaterial({ color: 0xfcec03 })
+            );
+            scene.add(adjLine);
+            adjLines.push({ highlight: adjLine, tile: tiles[adjTile] });
+          }
+        });
+      } else {
+        if (tile.available) {
+          tiles[prevTile].turret.moveFromTo(tiles[prevTile], tile);
+          clearHighlights();
+        } else {
+          clearHighlights();
+        }
+      }
       board.updateMatrix();
       selectFace.geometry.applyMatrix4(board.matrix);
       selectFace.visible = true;
-
-      if (tile.turret) {
-        scene.remove(tile.turret);
-        tile.turret = undefined;
-        turretCount -= 1;
-      } else {
-        if (turretCount < settings.MAX_TURRETS) {
-          const turretPos = {
-            x:
-              (meshPosition.getX(tile.a) +
-                meshPosition.getX(tile.b) +
-                meshPosition.getX(tile.c)) /
-              3,
-            y:
-              (meshPosition.getY(tile.a) +
-                meshPosition.getY(tile.b) +
-                meshPosition.getY(tile.c)) /
-              3,
-            z:
-              (meshPosition.getZ(tile.a) +
-                meshPosition.getZ(tile.b) +
-                meshPosition.getZ(tile.c)) /
-              3,
-          };
-          const newTurret = turret(turretPos, intersect.face.normal);
-          tile.turret = newTurret;
-          scene.add(newTurret);
-          objects.push(newTurret);
-          turretCount += 1;
-        }
-      }
     }
   } else {
     selectFace.visible = false;
+    clearHighlights();
   }
+}
+
+function clearHighlights() {
+  adjLines.forEach((adjLine) => {
+    adjLine.tile.available = false;
+    scene.remove(adjLine.highlight);
+  });
+  adjLines = [];
 }
 
 function animate(timeMs) {

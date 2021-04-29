@@ -27,8 +27,25 @@ let getObj = () => {
       c: sphereGeo.index.array[index + 2],
       selected: false,
       turret: undefined,
+      available: false,
     });
   }
+
+  // now, compute adjacentTiles
+  tiles.forEach((tile, index) => {
+    const adjacents = [];
+    const verts = [tile.a, tile.b, tile.c];
+    tiles.forEach((otile, oindex) => {
+      if (
+        index != oindex &&
+        (verts.includes(otile.a) ||
+          verts.includes(otile.b) ||
+          verts.includes(otile.c))
+      )
+        adjacents.push(oindex);
+    });
+    tile.adjacents = adjacents;
+  });
 
   // an array that maps a face index to a tile index
   const faceToTile = [];
