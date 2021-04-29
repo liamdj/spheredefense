@@ -2,7 +2,7 @@
 
 let getObj = () => {
   // the board itself
-  const sphereGeo = new THREE.SphereGeometry(settings.WORLD_RADIUS);
+  const sphereGeo = new THREE.SphereGeometry(settings.WORLD_RADIUS, 40, 40);
   const greenMat = new THREE.MeshPhongMaterial({ color: 0x038f08 });
   const board = new THREE.Mesh(sphereGeo, greenMat);
   board.position.set(0, 0, 0);
@@ -30,8 +30,27 @@ let getObj = () => {
       available: false,
     });
   }
+  const getTileCentroid = (tile, meshPosition) => {
+    return {
+      x:
+        (meshPosition.getX(tile.a) +
+          meshPosition.getX(tile.b) +
+          meshPosition.getX(tile.c)) /
+        3,
+      y:
+        (meshPosition.getY(tile.a) +
+          meshPosition.getY(tile.b) +
+          meshPosition.getY(tile.c)) /
+        3,
+      z:
+        (meshPosition.getZ(tile.a) +
+          meshPosition.getZ(tile.b) +
+          meshPosition.getZ(tile.c)) /
+        3,
+    };
+  };
 
-  // now, compute adjacentTiles
+  // now, compute adjacentTiles, distance to tile 0
   tiles.forEach((tile, index) => {
     const adjacents = [];
     const verts = [tile.a, tile.b, tile.c];
@@ -42,9 +61,15 @@ let getObj = () => {
           verts.includes(otile.b) ||
           verts.includes(otile.c))
       )
-        adjacents.push(oindex);
+        adjacents.push(otile);
     });
     tile.adjacents = adjacents;
+    tile.centroid = getTileCentroid(tile, board.geometry.attributes.position);
+    tile.distanceFromOrigin = Math.sqrt(
+      Math.pow(tile.centroid.x - tiles[0].centroid.x, 2) +
+        Math.pow(tile.centroid.y - tiles[0].centroid.y, 2) +
+        Math.pow(tile.centroid.z - tiles[0].centroid.z, 2)
+    );
   });
 
   // an array that maps a face index to a tile index

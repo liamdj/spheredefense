@@ -3,7 +3,7 @@ import { triangles } from "./objects/triangles.js";
 import { board, tileLines, tiles, faceToTile } from "./objects/board.js";
 import { selectionLines } from "./objects/selection.js";
 import { tower } from "./objects/tower.js";
-import { troops } from "./objects/troops.js";
+import { handleEnemyBehavior } from "./enemy.js";
 import { turret } from "./objects/turret.js";
 
 const selectLines = selectionLines[0];
@@ -12,10 +12,10 @@ const objects = [
   ...triangles,
   board,
   tileLines,
-  ...troops,
-  ...tower,
+  tower(tiles[0]),
   ...selectionLines,
 ];
+const meshPosition = board.geometry.attributes.position;
 
 let perspectiveCamera,
   controls,
@@ -123,14 +123,13 @@ function onClick(event) {
 
       if (tile.turret) {
         // clicked again on existing turret
-        scene.remove(tile.turret);
-        tile.turret = undefined;
-        turretCount -= 1;
+        // scene.remove(tile.turret);
+        // tile.turret = undefined;
+        // turretCount -= 1;
       } else {
         // clicked again on empty space
         if (turretCount < settings.MAX_TURRETS) {
-          const meshPosition = board.geometry.attributes.position;
-          const newTurret = turret(tile, meshPosition, intersect.face.normal);
+          const newTurret = turret(tile, intersect.face.normal);
           tile.turret = newTurret;
           scene.add(newTurret);
           objects.push(newTurret);
@@ -148,7 +147,6 @@ function onClick(event) {
 
       // draw the selected tile highlight
       const linePosition = selectFace.geometry.attributes.position;
-      const meshPosition = board.geometry.attributes.position;
 
       linePosition.copyAt(0, meshPosition, tile.a);
       linePosition.copyAt(1, meshPosition, tile.b);
@@ -158,22 +156,22 @@ function onClick(event) {
       if (tile.turret) {
         // show adjacent tiles
         tile.adjacents.forEach((adjTile, adjInd) => {
-          if (tiles[adjTile].turret === undefined) {
-            tiles[adjTile].available = true;
+          if (adjTile.turret === undefined) {
+            adjTile.available = true;
             const v1 = new THREE.Vector3(
-              meshPosition.getX(tiles[adjTile].a),
-              meshPosition.getY(tiles[adjTile].a),
-              meshPosition.getZ(tiles[adjTile].a)
+              meshPosition.getX(adjTile.a),
+              meshPosition.getY(adjTile.a),
+              meshPosition.getZ(adjTile.a)
             );
             const v2 = new THREE.Vector3(
-              meshPosition.getX(tiles[adjTile].b),
-              meshPosition.getY(tiles[adjTile].b),
-              meshPosition.getZ(tiles[adjTile].b)
+              meshPosition.getX(adjTile.b),
+              meshPosition.getY(adjTile.b),
+              meshPosition.getZ(adjTile.b)
             );
             const v3 = new THREE.Vector3(
-              meshPosition.getX(tiles[adjTile].c),
-              meshPosition.getY(tiles[adjTile].c),
-              meshPosition.getZ(tiles[adjTile].c)
+              meshPosition.getX(adjTile.c),
+              meshPosition.getY(adjTile.c),
+              meshPosition.getZ(adjTile.c)
             );
             const newGeometry = new THREE.BufferGeometry();
             const vertices = new Float32Array([
@@ -196,7 +194,7 @@ function onClick(event) {
               new THREE.MeshBasicMaterial({ color: 0xfcec03 })
             );
             scene.add(adjLine);
-            adjLines.push({ highlight: adjLine, tile: tiles[adjTile] });
+            adjLines.push({ highlight: adjLine, tile: adjTile });
           }
         });
       } else {
@@ -235,6 +233,7 @@ function animate(timeMs) {
     perspectiveCamera.position.y,
     perspectiveCamera.position.z
   );
+  handleEnemyBehavior(timeMs, tiles, scene, objects);
 
   controls.update();
 
@@ -252,7 +251,6 @@ function render() {
     const intersect = intersects[0];
     const tile = tiles[faceToTile[intersect.faceIndex]];
     const linePosition = selectLines.geometry.attributes.position;
-    const meshPosition = board.geometry.attributes.position;
 
     linePosition.copyAt(0, meshPosition, tile.a);
     linePosition.copyAt(1, meshPosition, tile.b);

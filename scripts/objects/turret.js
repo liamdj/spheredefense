@@ -1,21 +1,5 @@
-export const turret = (tile, meshPosition, normal) => {
-  const position = {
-    x:
-      (meshPosition.getX(tile.a) +
-        meshPosition.getX(tile.b) +
-        meshPosition.getX(tile.c)) /
-      3,
-    y:
-      (meshPosition.getY(tile.a) +
-        meshPosition.getY(tile.b) +
-        meshPosition.getY(tile.c)) /
-      3,
-    z:
-      (meshPosition.getZ(tile.a) +
-        meshPosition.getZ(tile.b) +
-        meshPosition.getZ(tile.c)) /
-      3,
-  };
+export const turret = (tile, normal) => {
+  const position = tile.centroid;
 
   const geometry = new THREE.CylinderGeometry(10, 10, 40, 32);
   const material = new THREE.MeshBasicMaterial({
@@ -36,40 +20,8 @@ export const turret = (tile, meshPosition, normal) => {
   turret.fromTile = tile;
 
   turret.moveFromTo = (fromTile, toTile) => {
-    turret.fromPos = {
-      x:
-        (meshPosition.getX(fromTile.a) +
-          meshPosition.getX(fromTile.b) +
-          meshPosition.getX(fromTile.c)) /
-        3,
-      y:
-        (meshPosition.getY(fromTile.a) +
-          meshPosition.getY(fromTile.b) +
-          meshPosition.getY(fromTile.c)) /
-        3,
-      z:
-        (meshPosition.getZ(fromTile.a) +
-          meshPosition.getZ(fromTile.b) +
-          meshPosition.getZ(fromTile.c)) /
-        3,
-    };
-    turret.toPos = {
-      x:
-        (meshPosition.getX(toTile.a) +
-          meshPosition.getX(toTile.b) +
-          meshPosition.getX(toTile.c)) /
-        3,
-      y:
-        (meshPosition.getY(toTile.a) +
-          meshPosition.getY(toTile.b) +
-          meshPosition.getY(toTile.c)) /
-        3,
-      z:
-        (meshPosition.getZ(toTile.a) +
-          meshPosition.getZ(toTile.b) +
-          meshPosition.getZ(toTile.c)) /
-        3,
-    };
+    turret.fromPos = fromTile.centroid;
+    turret.toPos = toTile.centroid;
     turret.fromTile = fromTile;
     turret.toTile = toTile;
     turret.moving = true;
