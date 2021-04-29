@@ -10,7 +10,7 @@ export const troop = (tile) => {
   troop.position.set(tile.centroid.x, tile.centroid.y, tile.centroid.z);
   troop.tile = tile;
   troop.moving = true;
-  troop.speed = settings.ENEMY_SPEED;
+  troop.speed = 0.1;
 
   // animate tile to tile movement
   troop.timeStep = (time) => {
@@ -40,6 +40,7 @@ export const troop = (tile) => {
       });
       troop.tile = closestTile;
       troop.moving = true;
+      console.log("moving");
     }
   };
 
