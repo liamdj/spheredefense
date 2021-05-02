@@ -18,6 +18,8 @@ export const handleCollisions = (objects, scene, score) => {
             dist(object.position, oobject.position) < object.range
           ) {
             oobject.health -= object.damage;
+            const shrinkFactor = 1 - object.damage / oobject.maxHealth;
+            oobject.geometry.scale(shrinkFactor, shrinkFactor, shrinkFactor);
           }
         });
       }

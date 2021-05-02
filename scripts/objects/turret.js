@@ -13,7 +13,7 @@ export const turret = (tile, normal) => {
   turret.rotateZ(Math.PI * normal.z);
 
   turret.moving = false;
-  turret.speed = 0.1;
+  turret.speed = 0.5;
   turret.toPos = undefined;
   turret.toTile = undefined;
   turret.fromPos = turret.position;
@@ -27,6 +27,8 @@ export const turret = (tile, normal) => {
     turret.toPos = toTile.centroid;
     turret.fromTile = fromTile;
     turret.toTile = toTile;
+    // make sure no other turrets can move to target tile meanwhile
+    turret.toTile.turret = 1;
     turret.moving = true;
   };
 
@@ -38,7 +40,7 @@ export const turret = (tile, normal) => {
         turret.toTile.centroid.y - turret.position.y,
         turret.toTile.centroid.z - turret.position.z
       );
-      if (step.length() < 0.1) {
+      if (step.length() < 1) {
         turret.moving = false;
         turret.fromTile.turret = undefined;
         turret.toTile.turret = turret;

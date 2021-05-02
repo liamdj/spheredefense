@@ -31,7 +31,7 @@ let perspectiveCamera,
 turretCount = 0;
 
 const container = document.getElementById("viewcontainer");
-const [width, height] = [container.clientWidth, container.clientHeight];
+const [width, height] = [window.innerWidth, window.innerHeight];
 let adjLines = [];
 
 init();
@@ -119,7 +119,7 @@ function onClick(event) {
     const intersect = intersects[0];
     const tile = tiles[faceToTile[intersect.faceIndex]];
 
-    if (tile.selected) {
+    if (selectedTile == faceToTile[intersect.faceIndex]) {
       // already highlighted
 
       if (tile.turret) {
@@ -137,12 +137,10 @@ function onClick(event) {
           turretCount += 1;
         }
       }
-      tile.selected = false;
       selectedTile = undefined;
       selectFace.visible = false;
       clearHighlights();
     } else {
-      tile.selected = true;
       const prevTile = selectedTile;
       selectedTile = faceToTile[intersect.faceIndex];
 
@@ -156,7 +154,7 @@ function onClick(event) {
       linePosition.copyAt(2, meshPosition, tile.c);
       linePosition.copyAt(3, meshPosition, tile.a);
 
-      if (tile.turret) {
+      if (tile.turret && !tile.turret.moving) {
         // show adjacent tiles
         tile.adjacents.forEach((adjTile, adjInd) => {
           if (adjTile.turret === undefined) {
@@ -261,10 +259,10 @@ function render() {
     const tile = tiles[faceToTile[intersect.faceIndex]];
     const linePosition = selectLines.geometry.attributes.position;
 
-    // linePosition.copyAt(0, meshPosition, tile.a);
-    // linePosition.copyAt(1, meshPosition, tile.b);
-    // linePosition.copyAt(2, meshPosition, tile.c);
-    // linePosition.copyAt(3, meshPosition, tile.a);
+    linePosition.copyAt(0, meshPosition, tile.a);
+    linePosition.copyAt(1, meshPosition, tile.b);
+    linePosition.copyAt(2, meshPosition, tile.c);
+    linePosition.copyAt(3, meshPosition, tile.a);
 
     board.updateMatrix();
 
