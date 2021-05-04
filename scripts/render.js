@@ -1,22 +1,23 @@
 import { handleCollisions } from "./utils.js";
 import { TrackballControls } from "./TrackBallControls.js";
 import { triangles } from "./objects/triangles.js";
-import { board, tileLines, tiles, faceToTile } from "./objects/board.js";
-import { selectionLines } from "./objects/selection.js";
-import { tower } from "./objects/tower.js";
+import { board } from "./objects/board.js";
+import { HoverLines, SelectFace } from "./objects/selection.js";
+import { Tower } from "./objects/tower.js";
 import { handleEnemyBehavior } from "./enemy.js";
-import { turret } from "./objects/turret.js";
+import { Turret } from "./objects/turret.js";
 
-const selectLines = selectionLines[0];
-const selectFace = selectionLines[1];
+const selectLines = new HoverLines();
+const selectFace = new SelectFace();
 let objects = [
   ...triangles,
   board,
-  tileLines,
-  tower(tiles[0]),
-  ...selectionLines,
+  board.lines,
+  new Tower(board.tiles[0]),
+  selectLines,
+  selectFace,
 ];
-const meshPosition = board.geometry.attributes.position;
+const meshPosition = board.mesh.geometry.attributes.position;
 
 let perspectiveCamera,
   controls,
@@ -49,7 +50,7 @@ function init() {
   scene.fog = new THREE.FogExp2(0x1c1c1c, 0.001);
 
   // objects
-  objects.forEach((object) => scene.add(object));
+  objects.forEach((object) => scene.add(object.mesh));
 
   // lights
   cameraLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -112,14 +113,14 @@ function onClick(event) {
 
   raycaster.setFromCamera(pointer, camera);
 
-  const intersects = raycaster.intersectObject(board);
+  const intersects = raycaster.intersectObject(board.mesh);
 
   if (intersects.length > 0) {
     // hit a tile
     const intersect = intersects[0];
-    const tile = tiles[faceToTile[intersect.faceIndex]];
+    const tile = board.tiles[board.faceToTile[intersect.faceIndex]];
 
-    if (selectedTile == faceToTile[intersect.faceIndex]) {
+    if (selectedTile == board.faceToTile[intersect.faceIndex]) {
       // already highlighted
 
       if (tile.turret) {
@@ -130,22 +131,22 @@ function onClick(event) {
       } else {
         // clicked again on empty space
         if (turretCount < settings.MAX_TURRETS) {
-          const newTurret = turret(tile, intersect.face.normal);
+          const newTurret = new Turret(tile, intersect.face.normal);
           tile.turret = newTurret;
-          scene.add(newTurret);
+          scene.add(newTurret.mesh);
           objects.push(newTurret);
           turretCount += 1;
         }
       }
       selectedTile = undefined;
-      selectFace.visible = false;
+      selectFace.mesh.visible = false;
       clearHighlights();
     } else {
       const prevTile = selectedTile;
-      selectedTile = faceToTile[intersect.faceIndex];
+      selectedTile = board.faceToTile[intersect.faceIndex];
 
       // draw the selected tile highlight
-      const linePosition = selectFace.geometry.attributes.position;
+      const linePosition = selectFace.mesh.geometry.attributes.position;
 
       linePosition.array[0] = tile.a.x;
 
@@ -200,18 +201,18 @@ function onClick(event) {
         });
       } else {
         if (tile.available) {
-          tiles[prevTile].turret.moveFromTo(tiles[prevTile], tile);
+          board.tiles[prevTile].turret.moveFromTo(board.tiles[prevTile], tile);
           clearHighlights();
         } else {
           clearHighlights();
         }
       }
-      board.updateMatrix();
-      selectFace.geometry.applyMatrix4(board.matrix);
-      selectFace.visible = true;
+      board.mesh.updateMatrix();
+      selectFace.mesh.geometry.applyMatrix4(board.mesh.matrix);
+      selectFace.mesh.visible = true;
     }
   } else {
-    selectFace.visible = false;
+    selectFace.mesh.visible = false;
     clearHighlights();
   }
 }
@@ -238,7 +239,7 @@ function animate(timeMs) {
   );
   // game logic
   if (!stats.gameover) {
-    handleEnemyBehavior(timeMs, tiles, scene, objects);
+    handleEnemyBehavior(timeMs, board.tiles, scene, objects);
     handleCollisions(objects, scene, score);
   }
 
@@ -252,25 +253,25 @@ function render() {
 
   raycaster.setFromCamera(pointer, camera);
 
-  const intersects = raycaster.intersectObject(board);
+  const intersects = raycaster.intersectObject(board.mesh);
 
   if (intersects.length > 0) {
     const intersect = intersects[0];
-    const tile = tiles[faceToTile[intersect.faceIndex]];
-    const linePosition = selectLines.geometry.attributes.position;
+    const tile = board.tiles[board.faceToTile[intersect.faceIndex]];
+    const linePosition = selectLines.mesh.geometry.attributes.position;
 
     linePosition.copyAt(0, meshPosition, tile.a);
     linePosition.copyAt(1, meshPosition, tile.b);
     linePosition.copyAt(2, meshPosition, tile.c);
     linePosition.copyAt(3, meshPosition, tile.a);
 
-    board.updateMatrix();
+    board.mesh.updateMatrix();
 
-    selectLines.geometry.applyMatrix4(board.matrix);
+    selectLines.mesh.geometry.applyMatrix4(board.mesh.matrix);
 
-    selectLines.visible = true;
+    selectLines.mesh.visible = true;
   } else {
-    selectLines.visible = false;
+    selectLines.mesh.visible = false;
   }
 
   renderer.render(scene, camera);

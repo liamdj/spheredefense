@@ -1,32 +1,33 @@
 // Tile highlights on selection
+export class HoverLines {
+  constructor() {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(new Float32Array(4 * 3), 3)
+    );
+    const material = new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+    });
 
-let getObj = () => {
-  let geometry, material;
+    this.mesh = new THREE.Line(geometry, material);
+  }
+  timeStep = (time) => {};
+}
 
-  geometry = new THREE.BufferGeometry();
-  geometry.setAttribute(
-    "position",
-    new THREE.BufferAttribute(new Float32Array(4 * 3), 3)
-  );
-  material = new THREE.LineBasicMaterial({
-    color: 0xffffff,
-    transparent: true,
-  });
-  const hoverLine = new THREE.Line(geometry, material);
-  hoverLine.timeStep = (time) => {};
-
-  geometry = new THREE.BufferGeometry();
-  geometry.setAttribute(
-    "position",
-    new THREE.BufferAttribute(new Float32Array(4 * 3), 3)
-  );
-  material = new THREE.MeshBasicMaterial({
-    color: 0xffffff,
-    transparent: true,
-  });
-  const selectFace = new THREE.Mesh(geometry, material);
-  selectFace.timeStep = (time) => {};
-
-  return [hoverLine, selectFace];
-};
-export const selectionLines = getObj();
+export class SelectFace {
+  constructor() {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(new Float32Array(4 * 3), 3)
+    );
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+    });
+    this.mesh = new THREE.Mesh(geometry, material);
+  }
+  timeStep = (time) => {};
+}
