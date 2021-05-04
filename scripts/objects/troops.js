@@ -1,52 +1,52 @@
-export const troop = (tile) => {
-  const geometry = new THREE.SphereGeometry(10);
-  const material = new THREE.MeshBasicMaterial({
-    color: settings.TEAM_2_COLOR,
-  });
+export class Troop {
+  constructor(tile) {
+    const geometry = new THREE.SphereGeometry(10);
+    const material = new THREE.MeshBasicMaterial({
+      color: settings.TEAM_2_COLOR,
+    });
 
-  const troop = new THREE.Mesh(geometry, material);
+    this.mesh = new THREE.Mesh(geometry, material);
 
-  // set initial tile coordinates
-  troop.position.set(tile.centroid.x, tile.centroid.y, tile.centroid.z);
-  troop.tile = tile;
-  troop.moving = true;
-  troop.speed = 0.1;
-  troop.health = 100;
-  troop.maxHealth = 100;
-  troop.type = "TROOP";
-  troop.range = 10;
-  troop.damage = 10;
+    // set initial tile coordinates
+    this.mesh.position.set(tile.centroid.x, tile.centroid.y, tile.centroid.z);
+    this.tile = tile;
+    this.moving = true;
+    this.speed = 0.1;
+    this.health = 100;
+    this.maxHealth = 100;
+    this.type = "TROOP";
+    this.range = 10;
+    this.damage = 10;
+  }
 
   // animate tile to tile movement
-  troop.timeStep = (time) => {
-    if (troop.moving) {
+  timeStep = (time) => {
+    if (this.moving) {
       // move towards its tile
       const step = new THREE.Vector3(
-        troop.tile.centroid.x - troop.position.x,
-        troop.tile.centroid.y - troop.position.y,
-        troop.tile.centroid.z - troop.position.z
+        this.tile.centroid.x - this.mesh.position.x,
+        this.tile.centroid.y - this.mesh.position.y,
+        this.tile.centroid.z - this.mesh.position.z
       );
       if (step.length() < 0.1) {
-        troop.moving = false;
+        this.moving = false;
       }
-      step.normalize().multiplyScalar(troop.speed);
-      troop.position.set(
-        step.x + troop.position.x,
-        step.y + troop.position.y,
-        step.z + troop.position.z
+      step.normalize().multiplyScalar(this.speed);
+      this.mesh.position.set(
+        step.x + this.mesh.position.x,
+        step.y + this.mesh.position.y,
+        step.z + this.mesh.position.z
       );
     } else {
       // find the tile closest to the tower
-      let closestTile = troop.tile.adjacents[0];
-      troop.tile.adjacents.forEach((adjacentTile) => {
+      let closestTile = this.tile.adjacents[0];
+      this.tile.adjacents.forEach((adjacentTile) => {
         if (adjacentTile.distanceFromOrigin < closestTile.distanceFromOrigin) {
           closestTile = adjacentTile;
         }
       });
-      troop.tile = closestTile;
-      troop.moving = true;
+      this.tile = closestTile;
+      this.moving = true;
     }
   };
-
-  return troop;
-};
+}

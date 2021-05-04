@@ -15,11 +15,15 @@ export const handleCollisions = (objects, scene, score) => {
           if (
             oobject.type &&
             oobject.type == "TROOP" &&
-            dist(object.position, oobject.position) < object.range
+            dist(object.mesh.position, oobject.mesh.position) < object.range
           ) {
             oobject.health -= object.damage;
             const shrinkFactor = 1 - object.damage / oobject.maxHealth;
-            oobject.geometry.scale(shrinkFactor, shrinkFactor, shrinkFactor);
+            oobject.mesh.geometry.scale(
+              shrinkFactor,
+              shrinkFactor,
+              shrinkFactor
+            );
           }
         });
       }
@@ -30,7 +34,7 @@ export const handleCollisions = (objects, scene, score) => {
           if (
             oobject.type &&
             oobject.type == "TROOP" &&
-            dist(object.position, oobject.position) < oobject.range
+            dist(object.mesh.position, oobject.mesh.position) < oobject.range
           ) {
             object.health -= oobject.damage;
           }
@@ -39,7 +43,7 @@ export const handleCollisions = (objects, scene, score) => {
 
       // remove any objects with no health
       if (object.health && object.health <= 0) {
-        scene.remove(object);
+        scene.remove(object.mesh);
         objects.splice(index, 1);
         // if we removed the tower, game over
         if (object.type == "TOWER") {

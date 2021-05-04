@@ -1,9 +1,9 @@
-import { troop } from "./objects/troops.js";
+import { Troop } from "./objects/troops.js";
 export const handleEnemyBehavior = (time, tiles, scene, objects) => {
   const frequency = settings.SPAWN_FREQUENCY;
   if (Math.random() < frequency) {
-    const newTroop = troop(tiles[parseInt(Math.random() * tiles.length)]);
-    scene.add(newTroop);
+    const newTroop = new Troop(tiles[parseInt(Math.random() * tiles.length)]);
+    scene.add(newTroop.mesh);
     objects.push(newTroop);
   }
 };
