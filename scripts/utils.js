@@ -60,7 +60,6 @@ export const handleCollisions = (objects, scene, score, time, blobMeshes) => {
                     stats.score += 1;
                     document.getElementById("score").innerHTML = stats.score;
                     const explosion = new Explosion(object.mesh.position, time);
-                    console.log(explosion);
                     objects.push(explosion);
                     scene.add(explosion.mesh);
                 }
