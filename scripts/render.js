@@ -1,5 +1,5 @@
 import { handleCollisions } from "./utils.js";
-import { TrackballControls } from "./TrackBallControls.js";
+import { TrackballControls } from "./lib/TrackBallControls.js";
 import { triangles } from "./objects/triangles.js";
 import { board } from "./objects/board.js";
 import { HoverLines, SelectFace } from "./objects/selection.js";

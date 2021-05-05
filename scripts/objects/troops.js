@@ -17,7 +17,7 @@ export class Troop {
         this.hopping = false;
         this.waitTimeStart = time;
 
-        this.speed = 1;
+        this.speed = settings.ENEMY_SPEED;
         this.health = 100;
         this.maxHealth = 100;
         this.type = "TROOP";
