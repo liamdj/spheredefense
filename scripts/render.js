@@ -1,11 +1,12 @@
 import { handleCollisions } from "./utils.js";
 import { TrackballControls } from "./TrackBallControls.js";
 import { Fighter } from "./objects/fighter.js";
-import { board, tileLines, tiles, faceToTile } from "./objects/board.js";
-import { selectionLines } from "./objects/selection.js";
+import { Explosion } from "./objects/particles.js";
+import { board } from "./objects/board.js";
 import { createPlanet } from "./objects/planet.js";
-import { handleEnemyBehavior } from "./enemy.js";
-import { turret } from "./objects/turret.js";
+import { checkNewEnemy } from "./enemy.js";
+import { Turret } from "./objects/turret.js";
+import { Tower } from "./objects/tower.js";
 import { createTriangles } from "./objects/triangles.js"
 
 const container = document.getElementById("viewcontainer");
@@ -14,20 +15,21 @@ const [width, height] = [window.innerWidth, window.innerHeight];
 const fighter = new Fighter(width / height);
 const planet = createPlanet();
 const triangles = createTriangles();
-let entities = [fighter, planet, triangles];
+const tower = new Tower(board.tiles[0]);
+const blobMeshes = [];
+const entities = [];
+const idToEntity = new Map();
+const scene = new THREE.Scene();
+const pointer = new THREE.Vector2();
+[fighter, planet, board, board.lines, triangles, tower].forEach(addEntity);
+const meshPosition = board.mesh.geometry.attributes.position;
 
 let perspectiveCamera,
     controls,
-    scene,
     renderer,
     cameraLight,
     raycaster,
-    selectedTile,
-    pointer,
     arrowHelper;
-
-let adjLines = [];
-let blobs = new THREE.Group();
 
 init();
 animate();
@@ -40,8 +42,8 @@ function init() {
     perspectiveCamera.position.z = 500;
 
     // world
-    scene = new THREE.Scene();
     scene.background = new THREE.Color(0x1c1c1c);
+    scene.fog = new THREE.FogExp2(0x1c1c1c, 0.001);
     // scene.fog = new THREE.FogExp2(0x1c1c1c, 0.001);
 
     const axesHelper = new THREE.AxesHelper(1000);
@@ -78,8 +80,6 @@ function init() {
     createControls(perspectiveCamera);
 
     raycaster = new THREE.Raycaster();
-
-    pointer = new THREE.Vector2();
 }
 
 function createControls(camera) {
@@ -104,31 +104,35 @@ function onWindowResize() {
     controls.handleResize();
 }
 function onPointerMove(event) {
-    const x = (event.clientX / window.innerWidth) * 2 - 1;
-    const y = -(event.clientY / window.innerHeight) * 2 + 1;
-    fighter.updateVelocity(-3 * x, 3 * y + 0.5);
+    pointer.set((event.clientX / window.innerWidth) * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1);
+    fighter.updateVelocity(-3 * pointer.x, 3 * pointer.y + 0.5);
 }
 
 function onClick(event) {
 
-    raycaster.setFromCamera(pointer, fighter.camera);
+    raycaster.setFromCamera(new THREE.Vector2(), fighter.camera);
 
-    const intersects = raycaster.intersectObject(blobs);
+    const intersects = raycaster.intersectObjects([board.mesh, ...blobMeshes]);
 
     let intersectPoint;
+
+    console.log(idToEntity);
 
     if (intersects.length > 0) {
         // hit something
         const intersect = intersects[0];
         intersectPoint = intersect.point;
+        const entity = idToEntity.get(intersect.object.id);
 
         // remove blob hit
-        blobs.remove(intersect.object);
+        if (entity.type == "TROOP") {
+            entity.health = -1;
+            console.log(entity);
+        }
     }
     const [leftBullet, rightBullet] = fighter.fireBullets(intersectPoint);
-    entities.push(leftBullet);
-    entities.push(rightBullet);
-    scene.add(leftBullet.mesh, rightBullet.mesh);
+    addEntity(leftBullet);
+    addEntity(rightBullet);
 }
 
 // function clearHighlights() {
@@ -145,24 +149,31 @@ function animate(timeMs) {
     requestAnimationFrame(animate);
 
     // fighter.updateVelocity(-2, 0);
-    entities = entities.filter((e) => {
+    entities.forEach((e) => {
         e.timeStep(time);
-        if (e.isGone)
-            scene.remove(e.mesh);
-        return !e.isGone;
     });
     // arrowHelper.position.copy(fighter.group.localToWorld(fighter.group.position.clone()));
     // arrowHelper.setDirection(vel.normalize());
     // cameraLight.position.copy(fighter.group.localToWorld(fighter.group.position.clone()));
     // // game logic
-    // if (!stats.gameover) {
-    //     handleEnemyBehavior(timeMs, tiles, scene, objects);
-    //     handleCollisions(objects, scene, score);
-    // }
+    if (!stats.gameover) {
+        const newTroop = checkNewEnemy(time, board.tiles);
+        if (newTroop) {
+            addEntity(newTroop);
+            blobMeshes.push(newTroop.mesh);
+        }
+        handleCollisions(entities, scene, score, time, blobMeshes);
+    }
 
     controls.update();
 
     render();
+}
+
+function addEntity(entity) {
+    idToEntity.set(entity.mesh.id, entity);
+    entities.push(entity);
+    scene.add(entity.mesh);
 }
 
 function render() {

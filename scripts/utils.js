@@ -2,7 +2,7 @@ import { Explosion } from "./objects/particles.js";
 
 const effects = [];
 
-export const handleCollisions = (objects, scene, score, time) => {
+export const handleCollisions = (objects, scene, score, time, blobMeshes) => {
     const dist = (pos1, pos2) =>
         Math.sqrt(
             Math.pow(pos1.x - pos2.x, 2) +
@@ -43,8 +43,8 @@ export const handleCollisions = (objects, scene, score, time) => {
                 });
             }
 
-            // remove any objects with no health
-            if (object.health && object.health <= 0) {
+            // remove any objects with no health or too far away
+            if (object.isGone) {
                 scene.remove(object.mesh);
                 objects.splice(index, 1);
                 // if we removed the tower, game over
@@ -56,9 +56,11 @@ export const handleCollisions = (objects, scene, score, time) => {
                 }
                 // if we remove a troop, increment score and add visual effect
                 if (object.type == "TROOP") {
+                    blobMeshes.splice(blobMeshes.findIndex((e) => e.id == object.mesh.id), 1);
                     stats.score += 1;
                     document.getElementById("score").innerHTML = stats.score;
                     const explosion = new Explosion(object.mesh.position, time);
+                    console.log(explosion);
                     objects.push(explosion);
                     scene.add(explosion.mesh);
                 }
