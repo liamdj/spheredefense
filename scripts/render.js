@@ -244,7 +244,7 @@ function animate(timeMs) {
     );
     // game logic
     if (!stats.gameover) {
-        handleEnemyBehavior(timeMs, board.tiles, scene, objects);
+        handleEnemyBehavior(time, board.tiles, scene, objects);
         handleCollisions(objects, scene, score, time);
     }
 

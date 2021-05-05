@@ -1,4 +1,10 @@
 export class Particle {
+
+    static geometry = new THREE.TetrahedronGeometry(3, 0);
+    static material = new THREE.MeshLambertMaterial({
+        color: settings.TEAM_2_COLOR
+    });
+
     constructor(time, normal) {
         this.mesh = new THREE.Mesh(Particle.geometry, Particle.material);
         this.startTime = time;
@@ -7,11 +13,6 @@ export class Particle {
         this.mesh.position.addScaledVector(this.direction, 5);
         this.speed = 15 * (1.5 + Math.random());
     }
-
-    static geometry = new THREE.TetrahedronGeometry(3, 0);
-    static material = new THREE.MeshLambertMaterial({
-        color: 0x990099
-    });
 
     timeStep = (time) => {
         const youth = (this.endTime - time) / (this.endTime - this.startTime);
