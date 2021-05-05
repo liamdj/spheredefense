@@ -1,52 +1,57 @@
-export const troop = (tile) => {
-  const geometry = new THREE.SphereGeometry(10);
-  const material = new THREE.MeshBasicMaterial({
-    color: settings.TEAM_2_COLOR,
-  });
+export class Troop {
 
-  const troop = new THREE.Mesh(geometry, material);
+    static geometry = new THREE.SphereGeometry(10);
+    static material = new THREE.MeshBasicMaterial({
+        color: settings.TEAM_2_COLOR,
+    });
+    static timeOfHop = 0.0001 * 800;
+    static timeBetweenHops = 0.0001 * 4000;
 
-  // set initial tile coordinates
-  troop.position.set(tile.centroid.x, tile.centroid.y, tile.centroid.z);
-  troop.tile = tile;
-  troop.moving = true;
-  troop.speed = 0.1;
-  troop.health = 100;
-  troop.maxHealth = 100;
-  troop.type = "TROOP";
-  troop.range = 10;
-  troop.damage = 10;
+    constructor(tile, time) {
 
-  // animate tile to tile movement
-  troop.timeStep = (time) => {
-    if (troop.moving) {
-      // move towards its tile
-      const step = new THREE.Vector3(
-        troop.tile.centroid.x - troop.position.x,
-        troop.tile.centroid.y - troop.position.y,
-        troop.tile.centroid.z - troop.position.z
-      );
-      if (step.length() < 0.1) {
-        troop.moving = false;
-      }
-      step.normalize().multiplyScalar(troop.speed);
-      troop.position.set(
-        step.x + troop.position.x,
-        step.y + troop.position.y,
-        step.z + troop.position.z
-      );
-    } else {
-      // find the tile closest to the tower
-      let closestTile = troop.tile.adjacents[0];
-      troop.tile.adjacents.forEach((adjacentTile) => {
-        if (adjacentTile.distanceFromOrigin < closestTile.distanceFromOrigin) {
-          closestTile = adjacentTile;
-        }
-      });
-      troop.tile = closestTile;
-      troop.moving = true;
+        this.mesh = new THREE.Mesh(Troop.geometry, Troop.material);
+
+        // set initial tile coordinates
+        this.tile = tile;
+        this.mesh.position.addScaledVector(tile.centroid, 1.025);
+        this.hopping = false;
+        this.waitTimeStart = time;
+
+        this.speed = 1;
+        this.health = 100;
+        this.maxHealth = 100;
+        this.type = "TROOP";
+        this.range = 10;
+        this.damage = 10;
     }
-  };
 
-  return troop;
-};
+    // animate tile to tile movement
+    timeStep = (time) => {
+        if (this.hopping) {
+            // move towards its tile
+            const t = Math.min((time - this.hopStartTime) * this.speed / Troop.timeOfHop, 1);
+            const s = (1 + (4 * (t - 0.5) * Math.abs(t - 0.5))) / 2;
+            this.curve.getPointAt(s, this.mesh.position);
+            if (t >= 1) {
+                this.hopping = false;
+                this.waitTimeStart = time;
+            }
+        } else if ((time - this.waitTimeStart) * this.speed >= Troop.timeBetweenHops) {
+            // find the tile closest to the tower
+            let closestTile = this.tile.adjacents[0];
+            this.tile.adjacents.forEach((adjacentTile) => {
+                if (adjacentTile.distanceFromOrigin < closestTile.distanceFromOrigin) {
+                    closestTile = adjacentTile;
+                }
+            });
+            this.tile = closestTile;
+            // produce new curve
+            const endpoint = new THREE.Vector3().addScaledVector(closestTile.centroid, 1.025);
+            const midpoint1 = new THREE.Vector3().addScaledVector(this.mesh.position, 0.7).addScaledVector(endpoint, 0.4);
+            const midpoint2 = new THREE.Vector3().addScaledVector(this.mesh.position, 0.4).addScaledVector(endpoint, 0.7);
+            this.curve = new THREE.CatmullRomCurve3([this.mesh.position, midpoint1, midpoint2, endpoint], 'chordal');
+            this.hopStartTime = time;
+            this.hopping = true;
+        }
+    };
+}
