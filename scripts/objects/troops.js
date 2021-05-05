@@ -25,6 +25,10 @@ export class Troop {
         this.damage = 10;
     }
 
+    get isGone() {
+        return this.health <= 0;
+    }
+
     // animate tile to tile movement
     timeStep = (time) => {
         if (this.hopping) {

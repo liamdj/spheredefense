@@ -1,4 +1,4 @@
-export class Particle {
+class Particle {
 
     static geometry = new THREE.TetrahedronGeometry(3, 0);
     static material = new THREE.MeshLambertMaterial({
