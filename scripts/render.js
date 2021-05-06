@@ -30,7 +30,10 @@ const container = document.getElementById("viewcontainer");
 const [width, height] = [window.innerWidth, window.innerHeight];
 let adjLines = [];
 
-const fighter = new Fighter(width / height);
+const fighterPos = new THREE.Vector3(0, 0, 0);
+fighterPos.addScaledVector(board.tiles[0].centroid, 1.3)
+
+const fighter = new Fighter(width / height, fighterPos);
 const tower = new Tower(board.tiles[0]);
 const blobMeshes = [];
 const entities = [];
@@ -47,7 +50,7 @@ function init() {
     const aspect = width / height;
 
     perspectiveCamera = new THREE.PerspectiveCamera(60, aspect, 1, 1000);
-    perspectiveCamera.position.z = 500;
+    perspectiveCamera.position.addScaledVector(board.tiles[0].centroid, 1.5);
 
     // world
     scene.background = new THREE.Color(0x1c1c1c);
@@ -88,6 +91,7 @@ function init() {
     window.addEventListener("resize", onWindowResize);
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("click", onClick);
+    window.addEventListener("keydown", onKeyDown);
 
     createControls(perspectiveCamera);
 
@@ -135,7 +139,6 @@ function onClick(event) {
             const intersect = intersects[0];
             intersectPoint = intersect.point;
             const entity = idToEntity.get(intersect.object.id);
-            console.log(entity);
 
             // remove blob hit
             if (entity.type == "TROOP") {
@@ -257,6 +260,18 @@ function onClick(event) {
     }
 }
 
+function onKeyDown(event) {
+    if(stats.phase === "flight") {
+        if(event.code === "Space") {
+            if(fighter.moving) {
+                fighter.pause();
+            } else {
+                fighter.resume();
+            }
+        }
+    }
+}
+
 function clearHighlights() {
     adjLines.forEach((adjLine) => {
         adjLine.tile.available = false;
@@ -283,6 +298,9 @@ function animate(timeMs) {
     // cameraLight.position.copy(fighter.group.localToWorld(fighter.group.position.clone()));
 
     // game logic
+    if(stats.phase === "build") {
+        fighter.pause();
+    }
     const newTroop = checkNewEnemy(time, board.tiles);
     if (newTroop) {
         addEntity(newTroop);

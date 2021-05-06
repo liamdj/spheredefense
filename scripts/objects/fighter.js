@@ -1,12 +1,13 @@
 import { Bullet } from "./bullets.js";
 
 export class Fighter {
-  constructor(aspect) {
-    const initialPosition = new THREE.Vector3(0, 1000, 0);
+  constructor(aspect, position) {
+    const initialPosition = new THREE.Vector3(position.x, position.y, position.z);
     const viewDirection = new THREE.Vector3(0, 0, -1);
 
     this.angularVel = new THREE.Vector3();
     this.speed = 2;
+    this.moving = true;
 
     // object exists in world coordinates (center at orign)
     this.mesh = new THREE.Object3D();
@@ -50,6 +51,16 @@ export class Fighter {
     // screenVel.clampLength(0, 0.1);
     // const forwardSpeed = Math.sqrt(1 - screenVel.lengthSq());
   };
+
+  pause = () => {
+    this.speed = 0;
+    this.moving = false;
+  }
+
+  resume = () => {
+    this.speed = 2;
+    this.moving = true;
+  }
 
   // this must be the longest I've ever spent on 15 lines of code
   timeStep = (time) => {
