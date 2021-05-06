@@ -19,8 +19,8 @@ export class Turret {
     this.fromPos = this.mesh.position;
     this.fromTile = tile;
     this.type = "TURRET";
-    this.range = 50;
-    this.damage = 0.5;
+    this.range = settings.TURRET_RANGE;
+    this.damage = settings.TURRET_DAMAGE;
   }
 
   moveFromTo = (fromTile, toTile) => {

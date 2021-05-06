@@ -4,36 +4,52 @@
         <style>
             body {
                 text-align: center;
+                padding: 0;
+                margin: 0;
             }
             #viewcontainer {
                 margin: 0 auto;
             }
+            #info {
+                position: absolute;
+                padding: 10px;
+                color: white;
+                text-align: left;
+                user-select: none;
+			}
         </style>
     </head>
     <body>
-        <div id="navbar">
-            <h1>Sphere Defense</h1>
-            <h4>Nathan Alam & Liam Johansson</h4>
+        <div id="info">
+            <h2>Sphere Defense</h2>
+            <p id="student">Nathan Alam and Liam Johansson<p>
+            <p>Score: <span id="score">0</span></p>
+            <p>Available Turrets: <span id="turrets-remaining">5</span></p>
         </div>
         <div id="viewcontainer"></div>
-        <p>Score: <span id="score">0</span></p>
-        <!--Import relevant scripts-->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous"></script>
+        <!--Set initial conditions-->
         <script type='text/javascript'>
-            var settings = {
-                WORLD_RADIUS: 300,
+            let settings = {
+                WORLD_RADIUS: 500,
                 TEAM_1_COLOR: 0xff0000,
                 TEAM_2_COLOR: 0x0000ff,
                 MAX_TURRETS: 5,
-                ENEMEY_SPEED: 0.1,
-                SPAWN_FREQUENCY: 0.005
+                ENEMY_SPEED: 1,
+                SPAWN_FREQUENCY: 0.005,
+                TURRET_DAMAGE: 0.5,
+                TURRET_RANGE: 50
             }
-            var stats = {
+            let stats = {
                 score: 0,
-                gameover: false
+                gameover: false,
+                phase: "build"
             }
         </script>
-        <script type="module" src="scripts/toindex.js"></script>
+        <!--Import relevant scripts-->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ==" crossorigin="anonymous"></script>
+        <script type="text/javascript" src="scripts/lib/dat.gui.min.js"></script>
+        <script type="module" src="scripts/lib/toindex.js"></script>
+        <script type="module" src="scripts/gui.js"></script>
         <script type="module" src="scripts/render.js"></script>
     </body>
 </html>
