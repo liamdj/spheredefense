@@ -26,9 +26,6 @@ export const handleCollisions = (objects, scene, score, time, blobMeshes) => {
               shrinkFactor,
               shrinkFactor
             );
-            if (oobject.health < 0) {
-              oobject.isGone = true;
-            }
           }
         });
       }
