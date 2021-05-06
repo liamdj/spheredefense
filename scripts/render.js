@@ -13,9 +13,6 @@ import { handleEnemyBehavior } from "./enemy.js";
 
 const meshPosition = board.mesh.geometry.attributes.position;
 
-// phase is build or flight
-let phase = "build";
-
 let perspectiveCamera,
   controls,
   scene,
@@ -65,8 +62,6 @@ function init() {
 
   const axesHelper = new THREE.AxesHelper(1000);
   scene.add(axesHelper);
-  // objects
-  // objects.forEach((object) => scene.add(object.mesh));
 
   const cameraHelper = new THREE.CameraHelper(fighter.camera);
   scene.add(cameraHelper);
@@ -76,7 +71,7 @@ function init() {
     fighter.group.position,
     0xffff00
   );
-  // scene.add(arrowHelper);
+  scene.add(arrowHelper);
 
   // objects
   objects.forEach((object) => scene.add(object.mesh));
@@ -135,16 +130,16 @@ function onPointerMove(event) {
     (event.clientX / window.innerWidth) * 2 - 1,
     -(event.clientY / window.innerHeight) * 2 + 1
   );
-  fighter.updateVelocity(-3 * pointer.x, 3 * pointer.y + 0.5);
+  if (stats.phase === "flight")
+    fighter.updateVelocity(-3 * pointer.x, 3 * pointer.y + 0.5);
 }
 
 function onClick(event) {
-  if (phase == "flight") {
-    const camera = perspectiveCamera;
-
+  if (stats.phase == "flight") {
     raycaster.setFromCamera(new THREE.Vector2(), fighter.camera);
 
     const intersects = raycaster.intersectObjects([board.mesh, ...blobMeshes]);
+    let intersectPoint;
 
     if (intersects.length > 0) {
       // hit a tile
@@ -298,7 +293,7 @@ function animate(timeMs) {
       objects.splice(index, 1);
     }
   });
-  if (phase === "build") {
+  if (stats.phase === "build") {
     cameraLight.position.set(
       perspectiveCamera.position.x,
       perspectiveCamera.position.y,
@@ -330,30 +325,35 @@ function addEntity(entity) {
 }
 
 function render() {
-  const camera = perspectiveCamera;
+  if (stats.phase == "build") {
+    const camera = perspectiveCamera;
 
-  raycaster.setFromCamera(pointer, camera);
+    raycaster.setFromCamera(pointer, camera);
 
-  const intersects = raycaster.intersectObject(board.mesh);
+    const intersects = raycaster.intersectObject(board.mesh);
 
-  if (intersects.length > 0) {
-    const intersect = intersects[0];
-    const tile = board.tiles[board.faceToTile[intersect.faceIndex]];
-    const linePosition = selectLines.mesh.geometry.attributes.position;
+    if (intersects.length > 0) {
+      const intersect = intersects[0];
+      const tile = board.tiles[board.faceToTile[intersect.faceIndex]];
+      const linePosition = selectLines.mesh.geometry.attributes.position;
 
-    linePosition.copyAt(0, meshPosition, tile.a);
-    linePosition.copyAt(1, meshPosition, tile.b);
-    linePosition.copyAt(2, meshPosition, tile.c);
-    linePosition.copyAt(3, meshPosition, tile.a);
+      linePosition.copyAt(0, meshPosition, tile.a);
+      linePosition.copyAt(1, meshPosition, tile.b);
+      linePosition.copyAt(2, meshPosition, tile.c);
+      linePosition.copyAt(3, meshPosition, tile.a);
 
-    board.mesh.updateMatrix();
+      board.mesh.updateMatrix();
 
-    selectLines.mesh.geometry.applyMatrix4(board.mesh.matrix);
+      selectLines.mesh.geometry.applyMatrix4(board.mesh.matrix);
 
-    selectLines.mesh.visible = true;
+      selectLines.mesh.visible = true;
+    } else {
+      selectLines.mesh.visible = false;
+    }
+
+    renderer.render(scene, camera);
   } else {
-    selectLines.mesh.visible = false;
+    fighter.camera.updateProjectionMatrix();
+    renderer.render(scene, fighter.camera);
   }
-
-  renderer.render(scene, camera);
 }

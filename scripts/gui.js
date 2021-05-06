@@ -1,21 +1,8 @@
 var gui = new dat.GUI();
 
 var options = {
-  velx: 0,
-  vely: 0,
-  camera: {
-    speed: 0.0001,
-  },
-  stop: function () {
-    this.velx = 0;
-    this.vely = 0;
-  },
-  reset: function () {
-    this.velx = 0.1;
-    this.vely = 0.1;
-    camera.position.z = 75;
-    camera.position.x = 0;
-    camera.position.y = 0;
+  togglePhase: function () {
+    stats.phase = stats.phase == "build" ? "flight" : "build";
   },
 };
 
@@ -54,3 +41,4 @@ gui
   .step(0.1)
   .name("Turret Damage")
   .listen();
+gui.add(options, "togglePhase").name("Toggle Phase");
