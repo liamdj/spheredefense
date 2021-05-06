@@ -27,12 +27,14 @@ class Triangle {
 }
 
 export const triangles = {};
-const triangleArr = []
+const triangleArr = [];
 const mesh = new THREE.Group();
 for (let i = 0; i < 500; i++) {
-    const triangle = new Triangle();
-    triangleArr.push(triangle);
-    mesh.add(triangle.mesh);
+  const triangle = new Triangle();
+  triangleArr.push(triangle);
+  mesh.add(triangle.mesh);
 }
 triangles.mesh = mesh;
-triangles.timeStep = (time) => { triangleArr.forEach((child) => child.timeStep(time)) };
+triangles.timeStep = (time) => {
+  triangleArr.forEach((child) => child.timeStep(time));
+};

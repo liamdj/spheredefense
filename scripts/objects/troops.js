@@ -20,7 +20,7 @@ export class Troop {
     this.health = 100;
     this.maxHealth = 100;
     this.type = "TROOP";
-    this.range = 10;
+    this.range = 100;
     this.damage = 10;
   }
 
