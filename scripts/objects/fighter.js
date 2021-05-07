@@ -23,23 +23,30 @@ export class Fighter {
     // group.castShadow = true;
 
     this.planeMesh = new THREE.Group();
-    const bodyGeo = new THREE.BoxGeometry(2, 2, 6);
-    const bodyMat = new THREE.MeshPhongMaterial({ color: 0xadc6f0 });
-    const bodyLeft = new THREE.Mesh(bodyGeo, bodyMat);
-    const bodyRight = new THREE.Mesh(bodyGeo, bodyMat);
-    bodyLeft.position.set(4, -4, -7);
-    bodyRight.position.set(-4, -4, -7);
-    this.planeMesh.add(bodyLeft);
-    this.planeMesh.add(bodyRight);
 
-    const noseGeo = new THREE.BoxGeometry(3, 3, 1);
-    const noseMat = new THREE.MeshPhongMaterial({ color: 0xadc6f0 });
-    const noseRight = new THREE.Mesh(noseGeo, noseMat);
-    noseRight.position.set(4, -4, -10);
-    const noseLeft = new THREE.Mesh(noseGeo, noseMat);
-    noseLeft.position.set(-4, -4, -10);
-    this.planeMesh.add(noseRight);
-    this.planeMesh.add(noseLeft);
+
+    const addObj = (obj) => this.group.add(obj);
+
+    // plane obj import
+    const loader = new THREE.OBJLoader();
+    loader.load(
+      // resource URL
+      "../../obj/plane.obj",
+      // called when resource is loaded
+      function (object) {
+        object.rotateX((-1 * Math.PI) / 2);
+        object.position.addScaledVector(new THREE.Vector3(0, -3, -3), 1);
+        addObj(object);
+      },
+      // called when loading is in progresses
+      function (xhr) {
+        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+      },
+      // called when loading has errors
+      function (error) {
+        console.log("An error occured while loading");
+      }
+    );
 
     this.camera = new THREE.PerspectiveCamera(80, aspect, 1, 1200);
     this.camera.lookAt(viewDirection);
