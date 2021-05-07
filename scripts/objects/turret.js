@@ -1,26 +1,30 @@
 export class Turret {
+  static range = settings.TURRET_RANGE;
+  static damage = settings.TURRET_DAMAGE;
+  static timeOfHop = 0.0001 * 800;
+
   constructor(tile, normal) {
-    const position = tile.centroid;
     const geometry = new THREE.CylinderGeometry(5, 4, 5, 32);
     const material = new THREE.MeshBasicMaterial({
       color: settings.TEAM_1_COLOR,
     });
     this.mesh = new THREE.Mesh(geometry, material);
 
-    this.mesh.position.set(position.x, position.y, position.z);
+    this.mesh.position.addScaledVector(tile.centroid, 1.025);
     this.mesh.rotateX(Math.PI * normal.x);
     this.mesh.rotateY(Math.PI * normal.y);
     this.mesh.rotateZ(Math.PI * normal.z);
 
-    this.moving = false;
-    this.speed = 0.5;
+    this.hopping = false;
+    this.hopStartTime = 0;
+    this.speed = 1;
     this.toPos = undefined;
     this.toTile = undefined;
     this.fromPos = this.mesh.position;
     this.fromTile = tile;
     this.type = "TURRET";
-    this.range = settings.TURRET_RANGE;
-    this.damage = settings.TURRET_DAMAGE;
+    this.range = Turret.range;
+    this.damage = Turret.damage;
   }
 
   moveFromTo = (fromTile, toTile) => {
@@ -30,28 +34,50 @@ export class Turret {
     this.toTile = toTile;
     // make sure no other turrets can move to target tile meanwhile
     this.toTile.turret = 1;
-    this.moving = true;
+
+    // produce new curve
+    const endpoint = new THREE.Vector3().addScaledVector(
+      this.toTile.centroid,
+      1.025
+    );
+    const midpoint1 = new THREE.Vector3()
+        .addScaledVector(this.fromTile.centroid, 0.7)
+        .addScaledVector(endpoint, 0.4);
+    const midpoint2 = new THREE.Vector3()
+        .addScaledVector(this.fromTile.centroid, 0.4)
+        .addScaledVector(endpoint, 0.7);
+    this.curve = new THREE.CatmullRomCurve3(
+        [this.mesh.position, midpoint1, midpoint2, endpoint],
+        "chordal"
+    );
+    this.hopping = true;
   };
 
   timeStep = (time) => {
-    if (this.moving) {
-      // move towards its tile
-      const step = new THREE.Vector3(
-        this.toTile.centroid.x - this.mesh.position.x,
-        this.toTile.centroid.y - this.mesh.position.y,
-        this.toTile.centroid.z - this.mesh.position.z
+    if (this.hopping) {
+      // hop towards its tile
+      const t = Math.min(
+          ((time - this.hopStartTime) * this.speed) / Turret.timeOfHop,
+          1
       );
-      if (step.length() < 1) {
-        this.moving = false;
-        this.fromTile.turret = undefined;
-        this.toTile.turret = this;
-      }
-      step.normalize().multiplyScalar(this.speed);
-      this.mesh.position.set(
-        step.x + this.mesh.position.x,
-        step.y + this.mesh.position.y,
-        step.z + this.mesh.position.z
-      );
+      const s = (1 + 4 * (t - 0.5) * Math.abs(t - 0.5)) / 2;
+      if(!isNaN(s))
+        this.curve.getPointAt(s, this.mesh.position)
+      if (s >= 1) {
+          this.hopping = false;
+          this.fromTile.turret = undefined;
+          this.curve = undefined;
+          this.mesh.position.multiplyScalar(0);
+          this.mesh.position.addScaledVector(
+            this.toTile.centroid,
+            1.025
+          );
+          this.toTile.turret = this;
+      } 
+      
+    } else {
+      this.hopStartTime = time;
     }
+    
   };
 }
