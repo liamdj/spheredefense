@@ -41,14 +41,14 @@ export class Turret {
       1.025
     );
     const midpoint1 = new THREE.Vector3()
-        .addScaledVector(this.fromTile.centroid, 0.7)
-        .addScaledVector(endpoint, 0.4);
+      .addScaledVector(this.fromTile.centroid, 0.7)
+      .addScaledVector(endpoint, 0.4);
     const midpoint2 = new THREE.Vector3()
-        .addScaledVector(this.fromTile.centroid, 0.4)
-        .addScaledVector(endpoint, 0.7);
+      .addScaledVector(this.fromTile.centroid, 0.4)
+      .addScaledVector(endpoint, 0.7);
     this.curve = new THREE.CatmullRomCurve3(
-        [this.mesh.position, midpoint1, midpoint2, endpoint],
-        "chordal"
+      [this.mesh.position, midpoint1, midpoint2, endpoint],
+      "chordal"
     );
     this.hopping = true;
   };
@@ -57,27 +57,21 @@ export class Turret {
     if (this.hopping) {
       // hop towards its tile
       const t = Math.min(
-          ((time - this.hopStartTime) * this.speed) / Turret.timeOfHop,
-          1
+        ((time - this.hopStartTime) * this.speed) / Turret.timeOfHop,
+        1
       );
       const s = (1 + 4 * (t - 0.5) * Math.abs(t - 0.5)) / 2;
-      if(!isNaN(s))
-        this.curve.getPointAt(s, this.mesh.position)
+      if (!isNaN(s)) this.curve.getPointAt(s, this.mesh.position);
       if (s >= 1) {
-          this.hopping = false;
-          this.fromTile.turret = undefined;
-          this.curve = undefined;
-          this.mesh.position.multiplyScalar(0);
-          this.mesh.position.addScaledVector(
-            this.toTile.centroid,
-            1.025
-          );
-          this.toTile.turret = this;
-      } 
-      
+        this.hopping = false;
+        this.fromTile.turret = undefined;
+        this.curve = undefined;
+        this.mesh.position.multiplyScalar(0);
+        this.mesh.position.addScaledVector(this.toTile.centroid, 1.025);
+        this.toTile.turret = this;
+      }
     } else {
       this.hopStartTime = time;
     }
-    
   };
 }
