@@ -1,6 +1,8 @@
 export class Troop {
     static timeOfHop = 0.0001 * 800;
     static timeBetweenHops = 0.0001 * 4000;
+    static dropTime = 600;
+    static dropHeight = settings.WORLD_RADIUS;
 
     constructor(tile, time) {
         const geometry = new THREE.SphereGeometry(10);
@@ -12,7 +14,8 @@ export class Troop {
 
         // set initial tile coordinates
         this.tile = tile;
-        this.mesh.position.addScaledVector(tile.centroid, 1.025);
+        this.mesh.position.addScaledVector(tile.centroid, 2);
+        this.falling = true;
         this.hopping = false;
         this.waitTimeStart = time;
 
@@ -30,6 +33,20 @@ export class Troop {
 
     // animate tile to tile movement
     timeStep = (time) => {
+        if (this.falling) {
+            const distVect = new THREE.Vector3(this.mesh.position.x, this.mesh.position.y, this.mesh.position.z);
+            distVect.sub(this.tile.centroid);
+            if(distVect.length() < 2) {
+                this.falling = false;
+                this.waitTimeStart = time;
+                this.mesh.position.multiplyScalar(0);
+                this.mesh.position.addScaledVector(this.tile.centroid, 1.025);
+            } else {
+                distVect.normalize();
+                distVect.multiplyScalar(-1 * Troop.dropHeight / Troop.dropTime);
+                this.mesh.position.add(distVect);
+            }
+        }
         if (this.hopping) {
             // move towards its tile
             const t = Math.min(
@@ -45,6 +62,7 @@ export class Troop {
         } else if (
             (time - this.waitTimeStart) * this.speed >=
             Troop.timeBetweenHops
+            && !this.falling
         ) {
             // find the tile closest to the tower
             let closestTile = this.tile.adjacents[0];
