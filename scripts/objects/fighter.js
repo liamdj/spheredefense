@@ -97,6 +97,14 @@ export class Fighter {
       worldPosition.normalize(),
       nextWorldPosition.normalize()
     );
+    // if too close to land, force above land
+    if(this.group.position.length() < settings.WORLD_RADIUS) {
+      const newVect = new THREE.Vector3(this.group.position.x, this.group.position.y, this.group.position.z);
+      newVect.normalize();
+      this.group.position.multiplyScalar(0);
+      this.group.position.addScaledVector(newVect, settings.WORLD_RADIUS);
+      console.log('bump')
+    }
     this.mesh.applyQuaternion(worldRotationDelta);
     // camera.updateProjectionMatrix();
   };
