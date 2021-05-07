@@ -39,7 +39,7 @@ THREE.OBJLoader.prototype = {
   load: function (url, onLoad, onProgress, onError) {
     var scope = this;
 
-    var loader = new THREE.XHRLoader(scope.manager);
+    var loader = new THREE.FileLoader(scope.manager);
     loader.setPath(this.path);
     loader.load(
       url,
@@ -555,13 +555,13 @@ THREE.OBJLoader.prototype = {
 
       var buffergeometry = new THREE.BufferGeometry();
 
-      buffergeometry.addAttribute(
+      buffergeometry.setAttribute(
         "position",
         new THREE.BufferAttribute(new Float32Array(geometry.vertices), 3)
       );
 
       if (geometry.normals.length > 0) {
-        buffergeometry.addAttribute(
+        buffergeometry.setAttribute(
           "normal",
           new THREE.BufferAttribute(new Float32Array(geometry.normals), 3)
         );
@@ -570,7 +570,7 @@ THREE.OBJLoader.prototype = {
       }
 
       if (geometry.uvs.length > 0) {
-        buffergeometry.addAttribute(
+        buffergeometry.setAttribute(
           "uv",
           new THREE.BufferAttribute(new Float32Array(geometry.uvs), 2)
         );
@@ -606,7 +606,7 @@ THREE.OBJLoader.prototype = {
           material.name = sourceMaterial.name;
         }
 
-        material.shading = sourceMaterial.smooth
+        material.flatShading = sourceMaterial.smooth
           ? THREE.SmoothShading
           : THREE.FlatShading;
 
