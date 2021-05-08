@@ -143,29 +143,33 @@ export class Fighter {
     };
 
     fireBullets = (intersectPoint) => {
-        const leftOffset = this.group.localToWorld(new THREE.Vector3(-4, -4, -12));
-        const rightOffset = this.group.localToWorld(new THREE.Vector3(4, -4, -12));
+        const leftStart = this.planeMesh.localToWorld(new THREE.Vector3(-4, -4, -10));
+        const rightStart = this.planeMesh.localToWorld(new THREE.Vector3(4, -4, -10));
         let leftBullet, rightBullet;
         if (intersectPoint) {
             // adjust bullet direction toward target
+            const leftDirection = this.planeMesh.localToWorld(
+                this.planeMesh.worldToLocal(intersectPoint.clone())
+                    .add(new THREE.Vector3(-2, -2, 0))
+            ).sub(leftStart);
             leftBullet = new Bullet(
-                leftOffset,
-                new THREE.Vector3(-2, -2, 0).add(intersectPoint)
+                leftStart,
+                leftDirection
             );
+            const rightDirection = this.planeMesh.localToWorld(
+                this.planeMesh.worldToLocal(intersectPoint.clone())
+                    .add(new THREE.Vector3(2, -2, 0))
+            ).sub(rightStart);
             rightBullet = new Bullet(
-                rightOffset,
-                new THREE.Vector3(2, -2, 0).add(intersectPoint)
+                rightStart,
+                rightDirection
             );
         } else {
             // fire straight ahead
-            const leftOffset2 = this.group.localToWorld(
-                new THREE.Vector3(-4, -4, -24)
-            );
-            const rightOffset2 = this.group.localToWorld(
-                new THREE.Vector3(4, -4, -24)
-            );
-            leftBullet = new Bullet(leftOffset, leftOffset2);
-            rightBullet = new Bullet(rightOffset, rightOffset2);
+            const straight = this.planeMesh.localToWorld(new THREE.Vector3(0, 0, -1))
+                .sub(this.planeMesh.getWorldPosition(new THREE.Vector3()));
+            leftBullet = new Bullet(leftStart, straight);
+            rightBullet = new Bullet(rightStart, straight);
         }
         return [leftBullet, rightBullet];
     };
