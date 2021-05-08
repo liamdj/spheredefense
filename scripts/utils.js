@@ -10,12 +10,6 @@ export const handleCollisions = (
   blobMeshes,
   idToEntity
 ) => {
-  // const dist = (pos1, pos2) =>
-  //     Math.sqrt(
-  //         Math.pow(pos1.x - pos2.x, 2) +
-  //         Math.pow(pos1.y - pos2.y, 2) +
-  //         Math.pow(pos1.z - pos2.z, 2)
-  //     );
   objects.forEach((object, index) => {
     if (object.type) {
       // turrets shoot at something in range
@@ -36,8 +30,6 @@ export const handleCollisions = (
             scene.add(bullet.mesh);
             const blob = idToEntity.get(target.id);
             blob.health -= object.damage;
-            const size = 0.25 + (0.75 * blob.health) / blob.maxHealth;
-            target.scale.set(size, size, size);
           }
         }
       }

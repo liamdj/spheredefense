@@ -33,6 +33,10 @@ export class Troop {
 
   // animate tile to tile movement
   timeStep = (time) => {
+    // set size according to health
+    const size = 0.25 + (0.75 * this.health) / this.maxHealth;
+    this.mesh.scale.set(size, size, size);
+
     if (this.falling) {
       const distVect = new THREE.Vector3(
         this.mesh.position.x,
@@ -62,6 +66,7 @@ export class Troop {
       if (t >= 1) {
         this.hopping = false;
         this.waitTimeStart = time;
+        this.health += 40;
       }
     } else if (
       (time - this.waitTimeStart) * this.speed >= Troop.timeBetweenHops &&
