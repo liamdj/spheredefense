@@ -48,7 +48,7 @@ export class Fighter {
     const loader = new THREE.OBJLoader();
     loader.load(
       // resource URL
-      "../../obj/plane.obj",
+      `${siteurl}/obj/plane.obj`,
       // called when resource is loaded
       function (object) {
         object.rotateX((-1 * Math.PI) / 2);
