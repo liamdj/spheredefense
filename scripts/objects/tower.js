@@ -12,7 +12,15 @@ export class Tower {
     this.mesh.position.set(position.x, position.y, position.z);
     this.type = "TOWER";
     this.health = 1000;
+    this.maxHealth = 1000;
   }
 
-  timeStep = (time) => {};
+  get isGone() {
+    return this.health <= 0;
+  }
+
+  timeStep = (time) => {
+    const size = 0.25 + (0.75 * this.health) / this.maxHealth;
+    this.mesh.scale.set(size, size, size);
+  };
 }
