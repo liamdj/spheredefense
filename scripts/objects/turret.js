@@ -3,14 +3,14 @@ import { Bullet } from "./bullets.js";
 export class Turret {
   static timeOfHop = 0.0001 * 800;
   static timeBetweenShots = 0.0001 * 400;
+  static turretModel = new THREE.Object3D();
 
   constructor(tile, normal) {
-    const geometry = new THREE.CylinderGeometry(5, 4, 5, 32);
-    const material = new THREE.MeshBasicMaterial({
-      color: settings.TEAM_1_COLOR,
-    });
-    this.mesh = new THREE.Mesh(geometry, material);
-
+    // generate turret appearance
+    this.mesh = new THREE.Object3D();
+    this.group = new THREE.Group();
+    this.group.add(Turret.turretModel.clone());
+    this.mesh.add(this.group);
     this.mesh.position.addScaledVector(tile.centroid, 1.025);
     this.mesh.rotateX(Math.PI * normal.x);
     this.mesh.rotateY(Math.PI * normal.y);

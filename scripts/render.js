@@ -9,6 +9,7 @@ import { TrackballControls } from "./lib/TrackBallControls.js";
 import { board } from "./objects/board.js";
 import { HoverLines, SelectFace } from "./objects/selection.js";
 import { Tower } from "./objects/tower.js";
+import { Troop } from "./objects/troops.js";
 import { handleEnemyBehavior } from "./enemy.js";
 
 const meshPosition = board.mesh.geometry.attributes.position;
@@ -21,7 +22,14 @@ let perspectiveCamera,
   raycaster,
   selectedTile,
   pointer,
-  turretCount;
+  turretCount,
+  fighter,
+  tower,
+  blobMeshes,
+  entities,
+  idToEntity,
+  selectLines,
+  selectFace;
 
 turretCount = 0;
 
@@ -29,18 +37,107 @@ const container = document.getElementById("viewcontainer");
 const [width, height] = [window.innerWidth, window.innerHeight];
 let adjLines = [];
 
-const fighter = new Fighter(width / height);
-const tower = new Tower(board.tiles[0]);
-const blobMeshes = [];
-const entities = [];
-const idToEntity = new Map();
-const selectLines = new HoverLines();
-const selectFace = new SelectFace();
-scene = new THREE.Scene();
-pointer = new THREE.Vector2();
+const loader = new THREE.GLTFLoader();
+const loadPlane = () => {
+  container.innerHTML = "Loading plane...";
+  loader.load(
+    // resource URL
+    `${siteurl}/models/plane.glb`,
+    // called when resource is loaded
+    function (model) {
+      const object = model.scene;
+      object.position.add(new THREE.Vector3(0, -2, -4));
+      Fighter.planeModel = object;
+      loadTower();
+    },
+    // called when loading is in progresses
+    function (xhr) {},
+    // called when loading has errors
+    function (error) {
+      console.log("An error occured while loading plane");
+    }
+  );
+};
+const loadTower = () => {
+  container.innerHTML = "Loading tower...";
+  loader.load(
+    // resource URL
+    `${siteurl}/models/tower.glb`,
+    // called when resource is loaded
+    function (model) {
+      const object = model.scene;
+      object.scale.multiplyScalar(500, 500, 500);
+      Tower.towerModel = object;
+      loadTurret();
+    },
+    // called when loading is in progresses
+    function (xhr) {},
+    // called when loading has errors
+    function (error) {
+      console.log("An error occured while loading tower");
+    }
+  );
+};
 
-init();
-animate();
+const loadTurret = () => {
+  container.innerHTML = "Loading turret...";
+  loader.load(
+    // resource URL
+    `${siteurl}/models/turret.glb`,
+    // called when resource is loaded
+    function (model) {
+      const object = model.scene;
+      object.scale.multiplyScalar(200, 200, 200);
+      Turret.turretModel = object;
+      loadTroop();
+    },
+    // called when loading is in progresses
+    function (xhr) {},
+    // called when loading has errors
+    function (error) {
+      console.log("An error occured while loading turret");
+    }
+  );
+};
+
+const loadTroop = () => {
+  container.innerHTML = "Loading troop...";
+  loader.load(
+    // resource URL
+    `${siteurl}/models/troop.glb`,
+    // called when resource is loaded
+    function (model) {
+      const object = model.scene;
+      object.scale.multiplyScalar(800, 800, 800);
+      Troop.troopModel = object;
+      startGame();
+    },
+    // called when loading is in progresses
+    function (xhr) {},
+    // called when loading has errors
+    function (error) {
+      console.log("An error occured while loading troop");
+    }
+  );
+};
+
+const startGame = () => {
+  container.innerHTML = "";
+  fighter = new Fighter(width / height);
+  tower = new Tower(board.tiles[0]);
+  blobMeshes = [];
+  entities = [];
+  idToEntity = new Map();
+  selectLines = new HoverLines();
+  selectFace = new SelectFace();
+  scene = new THREE.Scene();
+  pointer = new THREE.Vector2();
+
+  init();
+  animate();
+};
+
+loadPlane();
 
 function init() {
   const aspect = width / height;

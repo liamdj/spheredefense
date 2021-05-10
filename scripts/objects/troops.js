@@ -3,14 +3,14 @@ export class Troop {
   static timeBetweenHops = 0.0001 * 4000;
   static dropTime = 600;
   static dropHeight = settings.WORLD_RADIUS;
+  static troopModel = new THREE.Object3D();
 
   constructor(tile, time) {
-    const geometry = new THREE.SphereGeometry(10);
-    const material = new THREE.MeshBasicMaterial({
-      color: settings.TEAM_2_COLOR,
-    });
-
-    this.mesh = new THREE.Mesh(geometry, material);
+    // generate turret appearance
+    this.mesh = new THREE.Object3D();
+    this.group = new THREE.Group();
+    this.group.add(Troop.troopModel.clone());
+    this.mesh.add(this.group);
 
     // set initial tile coordinates
     this.tile = tile;
