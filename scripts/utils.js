@@ -1,4 +1,5 @@
 import { Explosion } from "./objects/particles.js";
+import { Troop } from "./objects/troops.js";
 
 const effects = [];
 
@@ -64,6 +65,7 @@ export const handleCollisions = (
           1
         );
         stats.score += 1;
+        Troop.deathSound.play();
         document.getElementById("score").innerHTML = stats.score;
         const explosion = new Explosion(object.mesh.position, time);
         objects.push(explosion);

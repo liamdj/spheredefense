@@ -3,14 +3,16 @@ export class Troop {
   static timeBetweenHops = 0.0001 * 4000;
   static dropTime = 600;
   static dropHeight = settings.WORLD_RADIUS;
+  static troopModel = new THREE.Object3D();
+  static hopSound = new THREE.Audio(new THREE.AudioListener());
+  static deathSound = new THREE.Audio(new THREE.AudioListener());
 
   constructor(tile, time) {
-    const geometry = new THREE.SphereGeometry(10);
-    const material = new THREE.MeshBasicMaterial({
-      color: settings.TEAM_2_COLOR,
-    });
-
-    this.mesh = new THREE.Mesh(geometry, material);
+    // generate turret appearance
+    this.mesh = new THREE.Object3D();
+    this.group = new THREE.Group();
+    this.group.add(Troop.troopModel.clone());
+    this.mesh.add(this.group);
 
     // set initial tile coordinates
     this.tile = tile;
@@ -49,6 +51,7 @@ export class Troop {
         this.waitTimeStart = time;
         this.mesh.position.multiplyScalar(0);
         this.mesh.position.addScaledVector(this.tile.centroid, 1.025);
+        Troop.hopSound.play();
       } else {
         distVect.normalize();
         distVect.multiplyScalar((-1 * Troop.dropHeight) / Troop.dropTime);
@@ -67,6 +70,7 @@ export class Troop {
         this.hopping = false;
         this.waitTimeStart = time;
         this.health += 40;
+        Troop.hopSound.play();
       }
     } else if (
       (time - this.waitTimeStart) * this.speed >= Troop.timeBetweenHops &&

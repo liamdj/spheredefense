@@ -7,6 +7,8 @@ export class Fighter {
   static acceleration = 0.05;
   static deceleration = 0.1;
   static damage = 75;
+  static planeModel = new THREE.Object3D();
+  static shootSound = new THREE.Audio(new THREE.AudioListener());
 
   constructor(aspect) {
     const initialPosition = new THREE.Vector3(
@@ -33,28 +35,7 @@ export class Fighter {
     // plane can roll while camera stays fixed
     this.planeMesh = new THREE.Group();
     this.planeMesh.position.set(0, -2, 0);
-    const addObj = (obj) => this.planeMesh.add(obj);
-
-    // plane obj import
-    const loader = new THREE.OBJLoader();
-    loader.load(
-      // resource URL
-      `${siteurl}/obj/plane.obj`,
-      // called when resource is loaded
-      function (object) {
-        object.rotateX((-1.05 * Math.PI) / 2);
-        object.position.add(new THREE.Vector3(0, -2, -4));
-        addObj(object);
-      },
-      // called when loading is in progresses
-      function (xhr) {
-        console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
-      },
-      // called when loading has errors
-      function (error) {
-        console.log("An error occured while loading");
-      }
-    );
+    this.planeMesh.add(Fighter.planeModel);
 
     this.camera = new THREE.PerspectiveCamera(80, aspect, 1, 1200);
     this.camera.lookAt(viewDirection);
