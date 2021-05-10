@@ -21,8 +21,7 @@ let perspectiveCamera,
   raycaster,
   selectedTile,
   pointer,
-  turretCount,
-  arrowHelper;
+  turretCount;
 
 turretCount = 0;
 
@@ -60,13 +59,6 @@ function init() {
   const cameraHelper = new THREE.CameraHelper(fighter.camera);
   scene.add(cameraHelper);
 
-  arrowHelper = new THREE.ArrowHelper(
-    new THREE.Vector3(0, 0, 1),
-    fighter.group.position,
-    0xffff00
-  );
-  scene.add(arrowHelper);
-
   [
     fighter,
     triangles,
@@ -97,6 +89,7 @@ function init() {
   window.addEventListener("pointermove", onPointerMove);
   window.addEventListener("click", onClick);
   window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
 
   createControls(perspectiveCamera);
 
@@ -125,33 +118,65 @@ function onWindowResize() {
 }
 function onPointerMove(event) {
   pointer.set(
-    (event.clientX / window.innerWidth) * 2 - 1,
-    -(event.clientY / window.innerHeight) * 2 + 1
+    (event.clientX / width) * 2 - 1,
+    -(event.clientY / height) * 2 + 1
   );
-  if (stats.phase === "flight") fighter.updateVelocity(pointer);
+  if (stats.phase === "flight") {
+    const distSqFromCenter =
+      (event.clientX - width / 2) ** 2 + (event.clientY - height / 2) ** 2;
+    const radius = 0.25 * Math.min(width, height);
+    const distSqFromCirc = distSqFromCenter - radius ** 2;
+    if (distSqFromCirc <= 0) {
+      const vector = new THREE.Vector3(pointer.x, pointer.y, -1);
+      vector.unproject(fighter.camera);
+      fighter.group.worldToLocal(vector);
+      fighter.crosshairs.setTo(vector.multiplyScalar(2));
+
+      // fighter.crosshairs.setTo(pointer);
+      fighter.updateVelocity(new THREE.Vector2(0, 0));
+    } else {
+      fighter.crosshairs.sprite.visible = false;
+      const scalar = Math.sqrt(
+        distSqFromCirc /
+          ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
+      );
+      fighter.updateVelocity(
+        pointer.clone().normalize().multiplyScalar(scalar)
+      );
+    }
+  }
 }
 
 function onClick(event) {
-  if (stats.phase == "flight") {
-    raycaster.setFromCamera(new THREE.Vector2(), fighter.camera);
+  if (stats.phase === "flight") {
+    const aimingToward =
+      fighter.angularVel.x == 0 && fighter.angularVel.y == 0
+        ? pointer
+        : new THREE.Vector2(0, 0);
+    raycaster.setFromCamera(aimingToward, fighter.camera);
 
     const intersects = raycaster.intersectObjects([board.mesh, ...blobMeshes]);
-    let intersectPoint;
 
     if (intersects.length > 0) {
       // hit a tile
       const intersect = intersects[0];
-      intersectPoint = intersect.point;
       const entity = idToEntity.get(intersect.object.id);
 
       // remove blob hit
       if (entity.type == "TROOP") {
-        entity.health = -1;
+        entity.health -= Fighter.damage;
       }
+      const [leftBullet, rightBullet] = fighter.fireBulletsAt(intersect.point);
+      addEntity(leftBullet);
+      addEntity(rightBullet);
+    } else {
+      const vector = new THREE.Vector3(aimingToward.x, aimingToward.y, -1);
+      vector.unproject(fighter.camera);
+      fighter.group.worldToLocal(vector);
+      const [leftBullet, rightBullet] = fighter.fireBulletsDirection(vector);
+      addEntity(leftBullet);
+      addEntity(rightBullet);
     }
-    const [leftBullet, rightBullet] = fighter.fireBullets(intersectPoint);
-    addEntity(leftBullet);
-    addEntity(rightBullet);
   } else {
     const camera = perspectiveCamera;
 
@@ -267,11 +292,15 @@ function onClick(event) {
 function onKeyDown(event) {
   if (stats.phase === "flight") {
     if (event.code === "Space") {
-      if (fighter.moving) {
-        fighter.pause();
-      } else {
-        fighter.resume();
-      }
+      fighter.breaking = true;
+    }
+  }
+}
+
+function onKeyUp(event) {
+  if (stats.phase === "flight") {
+    if (event.code === "Space") {
+      fighter.breaking = false;
     }
   }
 }
@@ -291,19 +320,19 @@ function animate(timeMs) {
 
   if (stats.phase === "build") {
     cameraLight.position.copy(perspectiveCamera.position);
-    // console.log(fighter.group.localToWorld(fighter.group.position.clone()));
+  } else if (stats.phase === "flight") {
+    cameraLight.position.copy(
+      fighter.group.localToWorld(fighter.group.position.clone())
+    );
   }
   entities.forEach((obj) => {
     obj.timeStep(time);
   });
 
-  // arrowHelper.position.copy(fighter.group.localToWorld(fighter.group.position.clone()));
-  // arrowHelper.setDirection(vel.normalize());
-  // cameraLight.position.copy(fighter.group.localToWorld(fighter.group.position.clone()));
-
   // game logic
   if (stats.phase === "build") {
-    fighter.pause();
+    fighter.breaking = true;
+    fighter.crosshairs.sprite.visible = false;
   }
   const newTroop = checkNewEnemy(time, board.tiles);
   if (newTroop) {
