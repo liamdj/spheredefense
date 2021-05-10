@@ -29,7 +29,8 @@ let perspectiveCamera,
   entities,
   idToEntity,
   selectLines,
-  selectFace;
+  selectFace,
+  audioListener;
 
 turretCount = 0;
 
@@ -37,7 +38,10 @@ const container = document.getElementById("viewcontainer");
 const [width, height] = [window.innerWidth, window.innerHeight];
 let adjLines = [];
 
+// load a bunch of assets
 const loader = new THREE.GLTFLoader();
+const audioLoader = new THREE.AudioLoader();
+audioListener = new THREE.AudioListener();
 const loadPlane = () => {
   container.innerHTML = "Loading plane...";
   loader.load(
@@ -110,7 +114,7 @@ const loadTroop = () => {
       const object = model.scene;
       object.scale.multiplyScalar(800, 800, 800);
       Troop.troopModel = object;
-      startGame();
+      loadShots();
     },
     // called when loading is in progresses
     function (xhr) {},
@@ -119,6 +123,44 @@ const loadTroop = () => {
       console.log("An error occured while loading troop");
     }
   );
+};
+
+const loadShots = () => {
+  container.innerHTML = "Loading lasers...";
+  audioLoader.load(`${siteurl}/sounds/laser.mp3`, function (buffer) {
+    const sound = new THREE.Audio(audioListener);
+    sound.setBuffer(buffer);
+    sound.setLoop(false);
+    sound.setVolume(0.5);
+    Fighter.shootSound = sound;
+    Turret.shootSound = sound;
+    loadPop();
+  });
+};
+
+const loadPop = () => {
+  container.innerHTML = "Loading misc sounds...";
+  audioLoader.load(`${siteurl}/sounds/pop.mp3`, function (buffer) {
+    const sound = new THREE.Audio(audioListener);
+    sound.setBuffer(buffer);
+    sound.setLoop(false);
+    sound.setVolume(0.5);
+    Troop.hopSound = sound;
+    Turret.placeSound = sound;
+    loadSplat();
+  });
+};
+
+const loadSplat = () => {
+  container.innerHTML = "Loading misc sounds...";
+  audioLoader.load(`${siteurl}/sounds/splat.mp3`, function (buffer) {
+    const sound = new THREE.Audio(audioListener);
+    sound.setBuffer(buffer);
+    sound.setLoop(false);
+    sound.setVolume(0.5);
+    Troop.deathSound = sound;
+    startGame();
+  });
 };
 
 const startGame = () => {
@@ -144,6 +186,7 @@ function init() {
 
   perspectiveCamera = new THREE.PerspectiveCamera(60, aspect, 1, 1000);
   perspectiveCamera.position.addScaledVector(board.tiles[0].centroid, 1.5);
+  perspectiveCamera.add(audioListener);
 
   // world
   scene.background = new THREE.Color(0x1c1c1c);
@@ -246,6 +289,7 @@ function onPointerMove(event) {
 
 function onClick(event) {
   if (stats.phase === "flight") {
+    Fighter.shootSound.play();
     const aimingToward =
       fighter.angularVel.x == 0 && fighter.angularVel.y == 0
         ? pointer

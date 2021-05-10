@@ -4,6 +4,8 @@ export class Turret {
   static timeOfHop = 0.0001 * 800;
   static timeBetweenShots = 0.0001 * 400;
   static turretModel = new THREE.Object3D();
+  static shootSound = new THREE.Audio(new THREE.AudioListener());
+  static placeSound = new THREE.Audio(new THREE.AudioListener());
 
   constructor(tile, normal) {
     // generate turret appearance
@@ -28,6 +30,7 @@ export class Turret {
     this.type = "TURRET";
     this.range = settings.TURRET_RANGE;
     this.damage = settings.TURRET_DAMAGE;
+    Turret.placeSound.play();
   }
 
   moveFromTo = (fromTile, toTile) => {
@@ -66,6 +69,7 @@ export class Turret {
       const s = (1 + 4 * (t - 0.5) * Math.abs(t - 0.5)) / 2;
       if (!isNaN(s)) this.curve.getPointAt(s, this.mesh.position);
       if (s >= 1) {
+        Turret.placeSound.play();
         this.hopping = false;
         this.fromTile.turret = undefined;
         this.curve = undefined;
@@ -85,6 +89,7 @@ export class Turret {
   attemptFireBullet = (targetPos, time) => {
     if (time < this.timeLastFired + Turret.timeBetweenShots) return;
     this.timeLastFired = time;
+    Turret.shootSound.play();
     return new Bullet(
       this.mesh.position,
       new THREE.Vector3().subVectors(targetPos, this.mesh.position)

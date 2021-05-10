@@ -8,6 +8,7 @@ export class Fighter {
   static deceleration = 0.1;
   static damage = 75;
   static planeModel = new THREE.Object3D();
+  static shootSound = new THREE.Audio(new THREE.AudioListener());
 
   constructor(aspect) {
     const initialPosition = new THREE.Vector3(
