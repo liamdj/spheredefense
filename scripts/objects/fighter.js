@@ -119,40 +119,46 @@ export class Fighter {
     );
   };
 
-  fireBullets = (intersectPoint) => {
+  fireBulletsAt = (intersectPoint) => {
     const leftStart = this.planeMesh.localToWorld(
       new THREE.Vector3(-4, -4, -10)
     );
     const rightStart = this.planeMesh.localToWorld(
       new THREE.Vector3(4, -4, -10)
     );
-    let leftBullet, rightBullet;
-    if (intersectPoint) {
-      // adjust bullet direction toward target
-      const leftDirection = this.planeMesh
-        .localToWorld(
-          this.planeMesh
-            .worldToLocal(intersectPoint.clone())
-            .add(new THREE.Vector3(-2, -2, 0))
-        )
-        .sub(leftStart);
-      leftBullet = new Bullet(leftStart, leftDirection);
-      const rightDirection = this.planeMesh
-        .localToWorld(
-          this.planeMesh
-            .worldToLocal(intersectPoint.clone())
-            .add(new THREE.Vector3(2, -2, 0))
-        )
-        .sub(rightStart);
-      rightBullet = new Bullet(rightStart, rightDirection);
-    } else {
-      // fire straight ahead
-      const straight = this.planeMesh
-        .localToWorld(new THREE.Vector3(0, 0, -1))
-        .sub(this.planeMesh.getWorldPosition(new THREE.Vector3()));
-      leftBullet = new Bullet(leftStart, straight);
-      rightBullet = new Bullet(rightStart, straight);
-    }
+    // adjust bullet direction toward target
+    const leftDirection = this.planeMesh
+      .localToWorld(
+        this.planeMesh
+          .worldToLocal(intersectPoint.clone())
+          .add(new THREE.Vector3(-2, -2, 0))
+      )
+      .sub(leftStart);
+    const leftBullet = new Bullet(leftStart, leftDirection);
+    const rightDirection = this.planeMesh
+      .localToWorld(
+        this.planeMesh
+          .worldToLocal(intersectPoint.clone())
+          .add(new THREE.Vector3(2, -2, 0))
+      )
+      .sub(rightStart);
+    const rightBullet = new Bullet(rightStart, rightDirection);
+    return [leftBullet, rightBullet];
+  };
+
+  fireBulletsDirection = (direction) => {
+    const leftStart = this.planeMesh.localToWorld(
+      new THREE.Vector3(-4, -4, -10)
+    );
+    const rightStart = this.planeMesh.localToWorld(
+      new THREE.Vector3(4, -4, -10)
+    );
+    // fire straight in direction
+    const adjusted = this.planeMesh
+      .localToWorld(direction)
+      .sub(this.planeMesh.getWorldPosition(new THREE.Vector3()));
+    const leftBullet = new Bullet(leftStart, adjusted);
+    const rightBullet = new Bullet(rightStart, adjusted);
     return [leftBullet, rightBullet];
   };
 }

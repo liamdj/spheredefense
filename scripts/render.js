@@ -124,7 +124,7 @@ function onPointerMove(event) {
   if (stats.phase === "flight") {
     const distSqFromCenter =
       (event.clientX - width / 2) ** 2 + (event.clientY - height / 2) ** 2;
-    const radius = 0.2 * Math.min(width, height);
+    const radius = 0.25 * Math.min(width, height);
     const distSqFromCirc = distSqFromCenter - radius ** 2;
     if (distSqFromCirc <= 0) {
       const vector = new THREE.Vector3(pointer.x, pointer.y, -1);
@@ -156,22 +156,27 @@ function onClick(event) {
     raycaster.setFromCamera(aimingToward, fighter.camera);
 
     const intersects = raycaster.intersectObjects([board.mesh, ...blobMeshes]);
-    let intersectPoint;
 
     if (intersects.length > 0) {
       // hit a tile
       const intersect = intersects[0];
-      intersectPoint = intersect.point;
       const entity = idToEntity.get(intersect.object.id);
 
       // remove blob hit
       if (entity.type == "TROOP") {
         entity.health -= Fighter.damage;
       }
+      const [leftBullet, rightBullet] = fighter.fireBulletsAt(intersect.point);
+      addEntity(leftBullet);
+      addEntity(rightBullet);
+    } else {
+      const vector = new THREE.Vector3(aimingToward.x, aimingToward.y, -1);
+      vector.unproject(fighter.camera);
+      fighter.group.worldToLocal(vector);
+      const [leftBullet, rightBullet] = fighter.fireBulletsDirection(vector);
+      addEntity(leftBullet);
+      addEntity(rightBullet);
     }
-    const [leftBullet, rightBullet] = fighter.fireBullets(intersectPoint);
-    addEntity(leftBullet);
-    addEntity(rightBullet);
   } else {
     const camera = perspectiveCamera;
 
