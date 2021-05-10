@@ -294,6 +294,13 @@ function onKeyDown(event) {
     if (event.code === "Space") {
       fighter.breaking = true;
     }
+    if (event.code === "Tab") {
+      stats.phase = "build";
+    }
+  } else {
+    if (event.code === "Tab") {
+      stats.phase = "flight";
+    }
   }
 }
 
@@ -326,6 +333,8 @@ function animate(timeMs) {
     );
   }
   entities.forEach((obj) => {
+    // skip the fighter if in build mode
+    if ((stats.phase !== "flight") & (obj == fighter)) return;
     obj.timeStep(time);
   });
 
