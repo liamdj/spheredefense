@@ -61,8 +61,8 @@ export class Board {
       ray.set(new THREE.Vector3(0, 0, 0), tile.centroid.normalize())
       const intersects = ray.intersectObject(this.mesh, true);
       const intersect = intersects[intersects.length - 1];
-      const offsetScalar = ((Board.planetModel.scale.x + 10) / 10000);
-      tile.centroid.multiplyScalar(offsetScalar * settings.WORLD_RADIUS * intersect.distance);
+      intersect.point.multiply(intersect.object.scale).multiply(intersect.object.parent.scale).multiply(intersect.object.parent.parent.scale)
+      tile.centroid = intersect.point;
       tile.distanceFromOrigin = Math.sqrt(
         Math.pow(tile.centroid.x - tiles[0].centroid.x, 2) +
           Math.pow(tile.centroid.y - tiles[0].centroid.y, 2) +
