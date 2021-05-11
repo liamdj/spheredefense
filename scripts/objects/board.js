@@ -6,7 +6,10 @@ export class Board {
       settings.WORLD_RADIUS,
       7
     ).toIndexed();
-    const boardMat = new THREE.MeshLambertMaterial({ wireframe: true, visible: false });
+    const boardMat = new THREE.MeshLambertMaterial({
+      wireframe: true,
+      visible: false,
+    });
     this.mesh = new THREE.Mesh(boardGeo, boardMat);
     this.mesh.position.set(0, 0, 0);
 
@@ -72,22 +75,19 @@ export class Board {
   timeStep = (time) => {};
 
   getTileCentroid = (tile, meshPosition) => {
-    return {
-      x:
-        (meshPosition.getX(tile.a) +
-          meshPosition.getX(tile.b) +
-          meshPosition.getX(tile.c)) /
+    return new THREE.Vector3(
+      (meshPosition.getX(tile.a) +
+        meshPosition.getX(tile.b) +
+        meshPosition.getX(tile.c)) /
         3,
-      y:
-        (meshPosition.getY(tile.a) +
-          meshPosition.getY(tile.b) +
-          meshPosition.getY(tile.c)) /
+      (meshPosition.getY(tile.a) +
+        meshPosition.getY(tile.b) +
+        meshPosition.getY(tile.c)) /
         3,
-      z:
-        (meshPosition.getZ(tile.a) +
-          meshPosition.getZ(tile.b) +
-          meshPosition.getZ(tile.c)) /
-        3,
-    };
+      (meshPosition.getZ(tile.a) +
+        meshPosition.getZ(tile.b) +
+        meshPosition.getZ(tile.c)) /
+        3
+    );
   };
 }

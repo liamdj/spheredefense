@@ -8,11 +8,8 @@ export class Troop {
   static deathSound = new THREE.Audio(new THREE.AudioListener());
 
   constructor(tile, time) {
-    // generate turret appearance
-    this.mesh = new THREE.Object3D();
-    this.group = new THREE.Group();
-    this.group.add(Troop.troopModel.clone());
-    this.mesh.add(this.group);
+    // copy troop mesh appearance
+    this.mesh = Troop.troopModel.clone();
 
     // set initial tile coordinates
     this.tile = tile;
