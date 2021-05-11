@@ -9,7 +9,11 @@ export class Troop {
 
   constructor(tile, time) {
     // copy troop mesh appearance
-    this.mesh = Troop.troopModel.clone();
+    // this.mesh = Troop.troopModel.clone();
+    this.mesh = new THREE.Object3D();
+    this.group = new THREE.Group();
+    this.group.add(Troop.troopModel.clone());
+    this.mesh.add(this.group);
 
     // set initial tile coordinates
     this.tile = tile;
