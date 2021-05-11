@@ -8,9 +8,13 @@ export class Troop {
   static deathSound = new THREE.Audio(new THREE.AudioListener());
 
   constructor(tile, time) {
+    const geometry = new THREE.SphereGeometry(20);
+    const material = new THREE.MeshBasicMaterial({
+        color: settings.TEAM_2_COLOR,
+        visible: false
+    });
     // copy troop mesh appearance
-    // this.mesh = Troop.troopModel.clone();
-    this.mesh = new THREE.Object3D();
+    this.mesh = new THREE.Mesh(geometry, material);
     this.group = new THREE.Group();
     this.group.add(Troop.troopModel.clone());
     this.mesh.add(this.group);
