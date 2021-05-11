@@ -1,13 +1,19 @@
-class Board {
+export class Board {
+  static planetModel = new THREE.Object3D();
   constructor() {
     // the board itself
     const boardGeo = new THREE.IcosahedronGeometry(
       settings.WORLD_RADIUS,
-      2
+      7
     ).toIndexed();
-    const boardMat = new THREE.MeshLambertMaterial({ color: 0x34c29a });
+    const boardMat = new THREE.MeshLambertMaterial({ wireframe: true, visible: false });
     this.mesh = new THREE.Mesh(boardGeo, boardMat);
     this.mesh.position.set(0, 0, 0);
+
+    // visual elements
+    this.group = new THREE.Group();
+    this.group.add(Board.planetModel);
+    this.mesh.add(this.group);
 
     // a grid for the edges around the board
     const edges = new THREE.EdgesGeometry(boardGeo);
@@ -85,5 +91,3 @@ class Board {
     };
   };
 }
-
-export const board = new Board();
