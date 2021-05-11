@@ -4,17 +4,16 @@ import { Explosion } from "./objects/particles.js";
 import { createPlanet } from "./objects/planet.js";
 import { checkNewEnemy } from "./enemy.js";
 import { Turret } from "./objects/turret.js";
-import { triangles } from "./objects/triangles.js";
+import { Star } from "./objects/stars.js";
 import { TrackballControls } from "./lib/TrackBallControls.js";
-import { board } from "./objects/board.js";
+import { Board } from "./objects/board.js";
 import { HoverLines, SelectFace } from "./objects/selection.js";
 import { Tower } from "./objects/tower.js";
 import { Troop } from "./objects/troops.js";
 import { handleEnemyBehavior } from "./enemy.js";
 
-const meshPosition = board.mesh.geometry.attributes.position;
-
 let perspectiveCamera,
+  board,
   controls,
   scene,
   renderer,
@@ -30,7 +29,8 @@ let perspectiveCamera,
   idToEntity,
   selectLines,
   selectFace,
-  audioListener;
+  audioListener,
+  meshPosition;
 
 turretCount = 0;
 
@@ -42,14 +42,56 @@ let adjLines = [];
 const loader = new THREE.GLTFLoader();
 const audioLoader = new THREE.AudioLoader();
 audioListener = new THREE.AudioListener();
+const loadWorld = () => {
+  container.innerHTML = "Loading world...";
+  loader.load(
+    // resource URL
+    `${siteurl}/models/globe.glb`,
+    // called when resource is loaded
+    function (model) {
+      const object = model.scene;
+      object.scale.multiplyScalar(9.7 * settings.WORLD_RADIUS)
+      Board.planetModel = object;
+      loadStar();
+    },
+    // called when loading is in progresses
+    function (xhr) {},
+    // called when loading has errors
+    function (error) {
+      console.log("An error occured while loading world");
+    }
+  );
+}
+const loadStar = () => {
+  container.innerHTML = "Loading stars...";
+  loader.load(
+    // resource URL
+    `${siteurl}/models/star.glb`,
+    // called when resource is loaded
+    function (model) {
+      const object = model.scene;
+      object.scale.multiplyScalar(100)
+      Star.starModel = object;
+      loadPlane();
+    },
+    // called when loading is in progresses
+    function (xhr) {},
+    // called when loading has errors
+    function (error) {
+      console.log("An error occured while loading stars");
+    }
+  );
+};
 const loadPlane = () => {
   container.innerHTML = "Loading plane...";
   loader.load(
     // resource URL
-    `${siteurl}/models/plane.glb`,
+    `${siteurl}/models/spaceship.glb`,
     // called when resource is loaded
     function (model) {
       const object = model.scene;
+      object.scale.multiplyScalar(100);
+      object.rotateY(-1 * Math.PI / 2)
       object.position.add(new THREE.Vector3(0, -2, -4));
       Fighter.planeModel = object;
       loadTower();
@@ -66,7 +108,7 @@ const loadTower = () => {
   container.innerHTML = "Loading tower...";
   loader.load(
     // resource URL
-    `${siteurl}/models/tower.glb`,
+    `${siteurl}/models/rocket.glb`,
     // called when resource is loaded
     function (model) {
       const object = model.scene;
@@ -164,6 +206,8 @@ const loadSplat = () => {
 };
 
 const startGame = () => {
+  board = new Board();
+  meshPosition = board.mesh.geometry.attributes.position;
   container.innerHTML = "";
   fighter = new Fighter(width / height);
   tower = new Tower(board.tiles[0]);
@@ -179,18 +223,18 @@ const startGame = () => {
   animate();
 };
 
-loadPlane();
+loadWorld();
 
 function init() {
   const aspect = width / height;
 
-  perspectiveCamera = new THREE.PerspectiveCamera(60, aspect, 1, 1000);
+  perspectiveCamera = new THREE.PerspectiveCamera(60, aspect, 1, 1000000);
   perspectiveCamera.position.addScaledVector(board.tiles[0].centroid, 1.5);
   perspectiveCamera.add(audioListener);
 
   // world
   scene.background = new THREE.Color(0x1c1c1c);
-  scene.fog = new THREE.FogExp2(0x1c1c1c, 0.001);
+  scene.fog = new THREE.FogExp2(0x1c1c1c, 0.00001);
   // scene.fog = new THREE.FogExp2(0x1c1c1c, 0.001);
 
   const axesHelper = new THREE.AxesHelper(1000);
@@ -199,9 +243,22 @@ function init() {
   const cameraHelper = new THREE.CameraHelper(fighter.camera);
   scene.add(cameraHelper);
 
+  const stars = {};
+  const starArr = [];
+  const mesh = new THREE.Group();
+  for (let i = 0; i < 500; i++) {
+    const star = new Star();
+    starArr.push(star);
+    mesh.add(star.mesh);
+  }
+  stars.mesh = mesh;
+  stars.timeStep = (time) => {
+    starArr.forEach((child) => child.timeStep(time));
+  };
+
   [
     fighter,
-    triangles,
+    stars,
     board,
     board.lines,
     selectLines,
