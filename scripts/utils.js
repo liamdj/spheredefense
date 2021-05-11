@@ -67,7 +67,8 @@ export const handleCollisions = (
         stats.score += 1;
         Troop.deathSound.play();
         document.getElementById("score").innerHTML = stats.score;
-        const explosion = new Explosion(object.mesh.position, time);
+        const pos = object.mesh.position;
+        const explosion = new Explosion(pos, pos.clone().normalize(), time);
         objects.push(explosion);
         scene.add(explosion.mesh);
       }

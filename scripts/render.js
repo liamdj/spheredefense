@@ -54,7 +54,7 @@ const loadWorld = () => {
       loadStar();
     },
     // called when loading is in progresses
-    function (xhr) {},
+    function (xhr) { },
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading world");
@@ -74,7 +74,7 @@ const loadStar = () => {
       loadPlane();
     },
     // called when loading is in progresses
-    function (xhr) {},
+    function (xhr) { },
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading stars");
@@ -96,7 +96,7 @@ const loadPlane = () => {
       loadTower();
     },
     // called when loading is in progresses
-    function (xhr) {},
+    function (xhr) { },
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading plane");
@@ -116,7 +116,7 @@ const loadTower = () => {
       loadTurret();
     },
     // called when loading is in progresses
-    function (xhr) {},
+    function (xhr) { },
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading tower");
@@ -137,7 +137,7 @@ const loadTurret = () => {
       loadTroop();
     },
     // called when loading is in progresses
-    function (xhr) {},
+    function (xhr) { },
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading turret");
@@ -158,7 +158,7 @@ const loadTroop = () => {
       loadShots();
     },
     // called when loading is in progresses
-    function (xhr) {},
+    function (xhr) { },
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading troop");
@@ -320,15 +320,14 @@ function onPointerMove(event) {
       const vector = new THREE.Vector3(pointer.x, pointer.y, -1);
       vector.unproject(fighter.camera);
       fighter.group.worldToLocal(vector);
-      fighter.crosshairs.setTo(vector.multiplyScalar(2));
+      fighter.crosshairs.setTo(vector.multiplyScalar(2.5));
 
-      // fighter.crosshairs.setTo(pointer);
       fighter.updateVelocity(new THREE.Vector2(0, 0));
     } else {
       fighter.crosshairs.sprite.visible = false;
       const scalar = Math.sqrt(
         distSqFromCirc /
-          ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
+        ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
       );
       fighter.updateVelocity(
         pointer.clone().normalize().multiplyScalar(scalar)
