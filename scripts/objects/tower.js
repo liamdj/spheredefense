@@ -2,16 +2,15 @@ export class Tower {
   static towerModel = new THREE.Object3D();
 
   constructor(tile) {
-    const position = tile.centroid;
-    const normal = new THREE.Vector3(position.x, position.y, position.z);
-    normal.normalize();
+    const normal = tile.centroid.clone().normalize();
 
     // generate tower appearance
     this.mesh = new THREE.Object3D();
     this.group = new THREE.Group();
     this.group.add(Tower.towerModel);
     this.mesh.add(this.group);
-    this.mesh.position.set(position.x, position.y, position.z);
+    this.mesh.position.copy(tile.centroid);
+    this.mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
 
     this.type = "TOWER";
     this.health = 1000;

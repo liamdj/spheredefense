@@ -3,7 +3,7 @@ export class Star {
   static starModel = new THREE.Object3D();
   constructor() {
     const spaceRadius = settings.WORLD_RADIUS * 2;
-    this.mesh = new THREE.Object3D;
+    this.mesh = new THREE.Object3D();
 
     this.mesh = new THREE.Object3D();
     this.group = new THREE.Group();

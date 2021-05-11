@@ -50,7 +50,7 @@ const loadWorld = () => {
     // called when resource is loaded
     function (model) {
       const object = model.scene;
-      object.scale.multiplyScalar(9.7 * settings.WORLD_RADIUS)
+      object.scale.multiplyScalar(9.7 * settings.WORLD_RADIUS);
       Board.planetModel = object;
       loadStar();
     },
@@ -61,7 +61,7 @@ const loadWorld = () => {
       console.log("An error occured while loading world");
     }
   );
-}
+};
 const loadStar = () => {
   container.innerHTML = "Loading stars...";
   loader.load(
@@ -70,7 +70,7 @@ const loadStar = () => {
     // called when resource is loaded
     function (model) {
       const object = model.scene;
-      object.scale.multiplyScalar(100)
+      object.scale.multiplyScalar(100);
       Star.starModel = object;
       loadPlane();
     },
@@ -91,8 +91,8 @@ const loadPlane = () => {
     function (model) {
       const object = model.scene;
       object.scale.multiplyScalar(100);
-      object.rotateY(-1 * Math.PI / 2)
-      object.position.add(new THREE.Vector3(0, -2, -4));
+      object.rotateY(-Math.PI / 2);
+      object.position.add(new THREE.Vector3(0, -4, -10));
       Fighter.planeModel = object;
       loadTower();
     },
@@ -240,8 +240,8 @@ function init() {
   const axesHelper = new THREE.AxesHelper(1000);
   scene.add(axesHelper);
 
-  const cameraHelper = new THREE.CameraHelper(fighter.camera);
-  scene.add(cameraHelper);
+  // const cameraHelper = new THREE.CameraHelper(fighter.camera);
+  // scene.add(cameraHelper);
 
   const stars = {};
   const starArr = [];
@@ -256,15 +256,9 @@ function init() {
     starArr.forEach((child) => child.timeStep(time));
   };
 
-  [
-    fighter,
-    stars,
-    board,
-    board.lines,
-    selectLines,
-    selectFace,
-    tower,
-  ].forEach(addEntity);
+  [fighter, stars, board, board.lines, selectLines, selectFace, tower].forEach(
+    addEntity
+  );
 
   // lights
   cameraLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -362,6 +356,7 @@ function onClick(event) {
 
       // remove blob hit
       if (entity.type == "TROOP") {
+        console.log(entity);
         entity.health -= Fighter.damage;
       }
       const [leftBullet, rightBullet] = fighter.fireBulletsAt(intersect.point);
