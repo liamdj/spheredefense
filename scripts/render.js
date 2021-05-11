@@ -1,7 +1,6 @@
 import { handleCollisions } from "./utils.js";
 import { Fighter } from "./objects/fighter.js";
 import { Explosion } from "./objects/particles.js";
-import { createPlanet } from "./objects/planet.js";
 import { checkNewEnemy } from "./enemy.js";
 import { Turret } from "./objects/turret.js";
 import { Star } from "./objects/stars.js";
@@ -50,7 +49,7 @@ const loadWorld = () => {
     // called when resource is loaded
     function (model) {
       const object = model.scene;
-      object.scale.multiplyScalar(9.7 * settings.WORLD_RADIUS);
+      object.scale.multiplyScalar(9.3 * settings.WORLD_RADIUS);
       Board.planetModel = object;
       loadStar();
     },
@@ -154,7 +153,7 @@ const loadTroop = () => {
     // called when resource is loaded
     function (model) {
       const object = model.scene;
-      object.scale.multiplyScalar(800, 800, 800);
+      object.scale.multiplyScalar(50);
       Troop.troopModel = object;
       loadShots();
     },
@@ -229,7 +228,7 @@ function init() {
   const aspect = width / height;
 
   perspectiveCamera = new THREE.PerspectiveCamera(60, aspect, 1, 1000000);
-  perspectiveCamera.position.addScaledVector(board.tiles[0].centroid, 1.5);
+  perspectiveCamera.position.addScaledVector(board.tiles[0].centroid, 2);
   perspectiveCamera.add(audioListener);
 
   // world

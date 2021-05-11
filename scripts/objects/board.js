@@ -57,12 +57,33 @@ export class Board {
       });
       tile.adjacents = adjacents;
       tile.centroid = this.getTileCentroid(tile, boardGeo.attributes.position);
+      const ray = new THREE.Raycaster();
+      ray.set(new THREE.Vector3(0, 0, 0), tile.centroid.normalize())
+      const intersects = ray.intersectObject(this.mesh, true);
+      const intersect = intersects[intersects.length - 1];
+      const offsetScalar = ((Board.planetModel.scale.x + 10) / 10000);
+      tile.centroid.multiplyScalar(offsetScalar * settings.WORLD_RADIUS * intersect.distance);
       tile.distanceFromOrigin = Math.sqrt(
         Math.pow(tile.centroid.x - tiles[0].centroid.x, 2) +
           Math.pow(tile.centroid.y - tiles[0].centroid.y, 2) +
           Math.pow(tile.centroid.z - tiles[0].centroid.z, 2)
       );
-    });
+    });   
+    // recursively get distance from tile 0
+    const setAdjacentDistances = (tile) => {
+      tile.adjacents.forEach(adjTile => {
+        if(adjTile.distanceFromOrigin == undefined) {
+          adjTile.distanceFromOrigin = tile.distanceFromOrigin + Math.sqrt(
+            Math.pow(adjTile.centroid.x - tile.centroid.x, 2) +
+              Math.pow(adjTile.centroid.y - tile.centroid.y, 2) +
+              Math.pow(adjTile.centroid.z - tile.centroid.z, 2)
+          );
+          setAdjacentDistances(adjTile);
+        }
+      }); 
+    }
+    tiles[0].distanceFromOrigin = 0;
+    setAdjacentDistances(tiles[0]);
 
     this.tiles = tiles;
     // an array that maps a face index to a tile index
