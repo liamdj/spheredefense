@@ -47,22 +47,14 @@ audioListener = new THREE.AudioListener();
 
 reload = () => {
   $(".dg").remove();
-  $("#info").remove();
-  stats = {
-    score: 0,
-    gameover: false,
-    phase: "build",
-    gamerunning: false,
-  };
   loadWorld();
 };
 showSettings = displaySettings;
 startGame = () => {
+  container.innerHTML = "";
   appendGUI(container);
-  stats.gamerunning = true;
   board = new Board();
   meshPosition = board.mesh.geometry.attributes.position;
-  container.innerHTML = "";
   fighter = new Fighter(width / height);
   tower = new Tower(board.tiles[0]);
   blobMeshes = [];
@@ -183,7 +175,7 @@ function onPointerMove(event) {
       fighter.crosshairs.sprite.visible = false;
       const scalar = Math.sqrt(
         distSqFromCirc /
-        ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
+          ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
       );
       fighter.updateVelocity(
         pointer.clone().normalize().multiplyScalar(scalar)
@@ -372,7 +364,7 @@ function clearHighlights() {
 }
 
 function animate(timeMs) {
-  if (stats.gameover || !stats.gamerunning) return;
+  if (stats.gameover) return;
   const time = timeMs * 0.0001;
   requestAnimationFrame(animate);
 

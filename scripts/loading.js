@@ -289,7 +289,6 @@ export const displaySettings = () => {
 };
 
 export const appendGUI = () => {
-  console.log("happened");
   $("#viewcontainer").append(`<div id="info">
     <h2>Sphere Defense</h2>
     <p id="student">Nathan Alam and Liam Johansson
