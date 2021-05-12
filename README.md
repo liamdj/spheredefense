@@ -32,3 +32,6 @@ Object files are all in the object directory under scripts.
 ## Contributing
 The main branch is a protected branch, and pull requests are required to push to it.
 Feel free to fork and create your own branch, however, and develop there in the meantime.
+
+## Model Credits
+Planet model: https://poly.google.com/view/dsrYdi4GZ8U 
