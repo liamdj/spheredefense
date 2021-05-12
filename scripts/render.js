@@ -286,6 +286,7 @@ function init() {
   window.addEventListener("resize", onWindowResize);
   window.addEventListener("pointermove", onPointerMove);
   window.addEventListener("click", onClick);
+  window.addEventListener("touchend", onClick);
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("keyup", onKeyUp);
 
