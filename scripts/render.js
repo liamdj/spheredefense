@@ -10,6 +10,7 @@ import { HoverLines, SelectFace } from "./objects/selection.js";
 import { Tower } from "./objects/tower.js";
 import { Troop } from "./objects/troops.js";
 import { handleEnemyBehavior } from "./enemy.js";
+import { loadWorld } from "./loading.js";
 
 let perspectiveCamera,
   board,
@@ -43,185 +44,12 @@ const mtlloader = new THREE.MTLLoader();
 const objLoader = new THREE.OBJLoader();
 const audioLoader = new THREE.AudioLoader();
 audioListener = new THREE.AudioListener();
-const loadWorld = () => {
-  container.innerHTML = "Loading world...";
-  mtlloader.load(
-    // resource URL
-    `${siteurl}/models/Mars_1239.mtl`,
-    // called when resource is loaded
-    function (material) {
-      objLoader.setMaterials(material);
-      objLoader.load(
-        // resource URL
-        `${siteurl}/models/Mars_1239.obj`,
-        // called when resource is loaded
-        function (model) {
-          const object = model;
-          object.scale.multiplyScalar(0.03 * settings.WORLD_RADIUS);
-          Board.planetModel = object;
-          loadStar();
-        },
-        // called when loading is in progresses
-        function (xhr) {},
-        // called when loading has errors
-        function (error) {
-          console.log("An error occured while loading world");
-        }
-      );
-    },
-    // called when loading is in progresses
-    function (xhr) { },
-    // called when loading has errors
-    function (error) {
-      console.log("An error occured while loading world");
-    }
-  );
-};
-const loadStar = () => {
-  container.innerHTML = "Loading stars...";
-  loader.load(
-    // resource URL
-    `${siteurl}/models/star.glb`,
-    // called when resource is loaded
-    function (model) {
-      const object = model.scene;
-      object.scale.multiplyScalar(100);
-      Star.starModel = object;
-      loadPlane();
-    },
-    // called when loading is in progresses
-    function (xhr) { },
-    // called when loading has errors
-    function (error) {
-      console.log("An error occured while loading stars");
-    }
-  );
-};
-const loadPlane = () => {
-  container.innerHTML = "Loading plane...";
-  loader.load(
-    // resource URL
-    `${siteurl}/models/spaceship.glb`,
-    // called when resource is loaded
-    function (model) {
-      const object = model.scene;
-      object.scale.multiplyScalar(100);
-      object.rotateY(-Math.PI / 2);
-      object.position.add(new THREE.Vector3(0, -4, -10));
-      Fighter.planeModel = object;
-      loadTower();
-    },
-    // called when loading is in progresses
-    function (xhr) { },
-    // called when loading has errors
-    function (error) {
-      console.log("An error occured while loading plane");
-    }
-  );
-};
-const loadTower = () => {
-  container.innerHTML = "Loading tower...";
-  loader.load(
-    // resource URL
-    `${siteurl}/models/rocket.glb`,
-    // called when resource is loaded
-    function (model) {
-      const object = model.scene;
-      object.scale.multiplyScalar(500, 500, 500);
-      Tower.towerModel = object;
-      loadTurret();
-    },
-    // called when loading is in progresses
-    function (xhr) { },
-    // called when loading has errors
-    function (error) {
-      console.log("An error occured while loading tower");
-    }
-  );
+
+const menuScreen = () => {
+  container.innerHTML = "<button onclick='startGame()'>Start Game</button>";
 };
 
-const loadTurret = () => {
-  container.innerHTML = "Loading turret...";
-  loader.load(
-    // resource URL
-    `${siteurl}/models/turret.glb`,
-    // called when resource is loaded
-    function (model) {
-      const object = model.scene;
-      object.scale.multiplyScalar(200, 200, 200);
-      Turret.turretModel = object;
-      loadTroop();
-    },
-    // called when loading is in progresses
-    function (xhr) { },
-    // called when loading has errors
-    function (error) {
-      console.log("An error occured while loading turret");
-    }
-  );
-};
-
-const loadTroop = () => {
-  container.innerHTML = "Loading troop...";
-  loader.load(
-    // resource URL
-    `${siteurl}/models/troop.glb`,
-    // called when resource is loaded
-    function (model) {
-      const object = model.scene;
-      object.scale.multiplyScalar(50);
-      Troop.troopModel = object;
-      loadShots();
-    },
-    // called when loading is in progresses
-    function (xhr) { },
-    // called when loading has errors
-    function (error) {
-      console.log("An error occured while loading troop");
-    }
-  );
-};
-
-const loadShots = () => {
-  container.innerHTML = "Loading lasers...";
-  audioLoader.load(`${siteurl}/sounds/laser.mp3`, function (buffer) {
-    const sound = new THREE.Audio(audioListener);
-    sound.setBuffer(buffer);
-    sound.setLoop(false);
-    sound.setVolume(0.5);
-    Fighter.shootSound = sound;
-    Turret.shootSound = sound;
-    loadPop();
-  });
-};
-
-const loadPop = () => {
-  container.innerHTML = "Loading misc sounds 1...";
-  audioLoader.load(`${siteurl}/sounds/pop.mp3`, function (buffer) {
-    const sound = new THREE.Audio(audioListener);
-    sound.setBuffer(buffer);
-    sound.setLoop(false);
-    sound.setVolume(0.5);
-    Troop.hopSound = sound;
-    Turret.placeSound = sound;
-    loadSplat();
-  });
-};
-
-const loadSplat = () => {
-  container.innerHTML = "Loading misc sounds 2...";
-  audioLoader.load(`${siteurl}/sounds/splat.mp3`, function (buffer) {
-    const sound = new THREE.Audio(audioListener);
-    sound.setBuffer(buffer);
-    sound.setLoop(false);
-    sound.setVolume(0.5);
-    Troop.deathSound = sound;
-    startGame();
-  });
-};
-
-const startGame = () => {
-  container.innerHTML = "Initializing game...";
+startGame = () => {
   board = new Board();
   meshPosition = board.mesh.geometry.attributes.position;
   container.innerHTML = "";
@@ -239,7 +67,15 @@ const startGame = () => {
   animate();
 };
 
-loadWorld();
+loadWorld(
+  container,
+  loader,
+  audioLoader,
+  audioListener,
+  menuScreen,
+  mtlloader,
+  objLoader
+);
 
 function init() {
   const aspect = width / height;
