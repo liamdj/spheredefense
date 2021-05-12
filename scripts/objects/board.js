@@ -18,17 +18,6 @@ export class Board {
     this.group.add(Board.planetModel);
     this.mesh.add(this.group);
 
-    // a grid for the edges around the board
-    const edges = new THREE.EdgesGeometry(boardGeo);
-    this.lines = {};
-    this.lines.mesh = new THREE.LineSegments(
-      edges,
-      new THREE.LineDashedMaterial({ color: 0x000000, dashSize: 3, gapSize: 5 })
-    );
-    this.lines.mesh.computeLineDistances();
-    this.lines.mesh.position.set(0, 0, 0);
-    this.lines.timeStep = (time) => {};
-
     // an array that abstractly represents tile vertices which may or may not be mesh vertices
     const tiles = [];
     for (let index = 0; index < boardGeo.index.array.length; index += 3) {
@@ -41,7 +30,29 @@ export class Board {
         available: false,
       });
     }
-
+    const boardArray = boardGeo.attributes.position.array;
+    for (let index = 0; index < boardArray.length; index += 3) {
+      const oldPoint = new THREE.Vector3(boardArray[index], boardArray[index + 1], boardArray[index + 2])
+      const viewPoint = oldPoint.clone().multiplyScalar(1.5);
+      const ray = new THREE.Raycaster(viewPoint, oldPoint.sub(viewPoint).normalize());
+      const intersects = ray.intersectObject(Board.planetModel, true);
+      const intersect = intersects[0];
+      if(intersect) {
+        const scale = new THREE.Vector3(1,1,1);
+        let childObj = intersect.object.parent;
+        let maxCount = 10
+        while(childObj.parent && maxCount > 0) {
+          scale.multiply(childObj.scale);
+          childObj = childObj.parent;
+          maxCount -= 1;
+        }
+        intersect.point.multiply(scale).multiplyScalar(1.01);
+        boardArray[index] = intersect.point.x;
+        boardArray[index + 1] = intersect.point.y;
+        boardArray[index + 2] = intersect.point.z;
+      } 
+    }
+    
     // now, compute adjacentTiles, distance to tile 0
     tiles.forEach((tile, index) => {
       const adjacents = [];
@@ -57,27 +68,17 @@ export class Board {
       });
       tile.adjacents = adjacents;
       tile.centroid = this.getTileCentroid(tile, boardGeo.attributes.position);
-      const ray = new THREE.Raycaster();
-      ray.set(new THREE.Vector3(0, 0, 0), tile.centroid.normalize())
-      const intersects = ray.intersectObject(this.mesh, true);
-      const intersect = intersects[intersects.length - 1];
-      intersect.point.multiply(intersect.object.scale).multiply(intersect.object.parent.scale).multiply(intersect.object.parent.parent.scale)
-      tile.centroid = intersect.point;
-      tile.distanceFromOrigin = Math.sqrt(
-        Math.pow(tile.centroid.x - tiles[0].centroid.x, 2) +
-          Math.pow(tile.centroid.y - tiles[0].centroid.y, 2) +
-          Math.pow(tile.centroid.z - tiles[0].centroid.z, 2)
-      );
     });   
     // recursively get distance from tile 0
     const setAdjacentDistances = (tile) => {
       tile.adjacents.forEach(adjTile => {
-        if(adjTile.distanceFromOrigin == undefined) {
-          adjTile.distanceFromOrigin = tile.distanceFromOrigin + Math.sqrt(
-            Math.pow(adjTile.centroid.x - tile.centroid.x, 2) +
-              Math.pow(adjTile.centroid.y - tile.centroid.y, 2) +
-              Math.pow(adjTile.centroid.z - tile.centroid.z, 2)
-          );
+        const thisDist = tile.distanceFromOrigin + Math.sqrt(
+          Math.pow(adjTile.centroid.x - tile.centroid.x, 2) +
+            Math.pow(adjTile.centroid.y - tile.centroid.y, 2) +
+            Math.pow(adjTile.centroid.z - tile.centroid.z, 2)
+        );
+        if(adjTile.distanceFromOrigin == undefined || adjTile.distanceFromOrigin > thisDist) {
+          adjTile.distanceFromOrigin = thisDist;
           setAdjacentDistances(adjTile);
         }
       }); 
@@ -91,12 +92,13 @@ export class Board {
     for (let index = 0; index < boardGeo.index.array.length / 3; index++) {
       this.faceToTile.push(index);
     }
+    
   }
 
   timeStep = (time) => {};
 
   getTileCentroid = (tile, meshPosition) => {
-    return new THREE.Vector3(
+    let overlayCentroid = new THREE.Vector3(
       (meshPosition.getX(tile.a) +
         meshPosition.getX(tile.b) +
         meshPosition.getX(tile.c)) /
@@ -110,5 +112,22 @@ export class Board {
         meshPosition.getZ(tile.c)) /
         3
     );
+    const viewPoint = overlayCentroid.clone().multiplyScalar(1.5);
+    const ray = new THREE.Raycaster(viewPoint, overlayCentroid.clone().sub(viewPoint).normalize());
+    const intersects = ray.intersectObject(Board.planetModel, true);
+    const intersect = intersects[0];
+    if(intersect) {
+      const scale = new THREE.Vector3(1,1,1);
+      let childObj = intersect.object.parent;
+      let maxCount = 10
+      while(childObj.parent && maxCount > 0) {
+        scale.multiply(childObj.scale);
+        childObj = childObj.parent;
+        maxCount -= 1;
+      }
+      intersect.point.multiply(scale).multiplyScalar(1.01);
+      overlayCentroid = intersect.point;
+    } 
+    return overlayCentroid;
   };
 }

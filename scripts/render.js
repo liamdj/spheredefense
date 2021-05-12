@@ -39,19 +39,35 @@ let adjLines = [];
 
 // load a bunch of assets
 const loader = new THREE.GLTFLoader();
+const mtlloader = new THREE.MTLLoader();
+const objLoader = new THREE.OBJLoader();
 const audioLoader = new THREE.AudioLoader();
 audioListener = new THREE.AudioListener();
 const loadWorld = () => {
   container.innerHTML = "Loading world...";
-  loader.load(
+  mtlloader.load(
     // resource URL
-    `${siteurl}/models/globe.glb`,
+    `${siteurl}/models/Mars_1239.mtl`,
     // called when resource is loaded
-    function (model) {
-      const object = model.scene;
-      object.scale.multiplyScalar(9.3 * settings.WORLD_RADIUS);
-      Board.planetModel = object;
-      loadStar();
+    function (material) {
+      objLoader.setMaterials(material);
+      objLoader.load(
+        // resource URL
+        `${siteurl}/models/Mars_1239.obj`,
+        // called when resource is loaded
+        function (model) {
+          const object = model;
+          object.scale.multiplyScalar(0.03 * settings.WORLD_RADIUS);
+          Board.planetModel = object;
+          loadStar();
+        },
+        // called when loading is in progresses
+        function (xhr) {},
+        // called when loading has errors
+        function (error) {
+          console.log("An error occured while loading world");
+        }
+      );
     },
     // called when loading is in progresses
     function (xhr) {},
@@ -180,7 +196,7 @@ const loadShots = () => {
 };
 
 const loadPop = () => {
-  container.innerHTML = "Loading misc sounds...";
+  container.innerHTML = "Loading misc sounds 1...";
   audioLoader.load(`${siteurl}/sounds/pop.mp3`, function (buffer) {
     const sound = new THREE.Audio(audioListener);
     sound.setBuffer(buffer);
@@ -193,7 +209,7 @@ const loadPop = () => {
 };
 
 const loadSplat = () => {
-  container.innerHTML = "Loading misc sounds...";
+  container.innerHTML = "Loading misc sounds 2...";
   audioLoader.load(`${siteurl}/sounds/splat.mp3`, function (buffer) {
     const sound = new THREE.Audio(audioListener);
     sound.setBuffer(buffer);
@@ -205,6 +221,7 @@ const loadSplat = () => {
 };
 
 const startGame = () => {
+  container.innerHTML = "Initializing game...";
   board = new Board();
   meshPosition = board.mesh.geometry.attributes.position;
   container.innerHTML = "";
@@ -255,9 +272,7 @@ function init() {
     starArr.forEach((child) => child.timeStep(time));
   };
 
-  [fighter, stars, board, board.lines, selectLines, selectFace, tower].forEach(
-    addEntity
-  );
+  [fighter, stars, board, selectLines, selectFace, tower].forEach(addEntity);
 
   // lights
   cameraLight = new THREE.DirectionalLight(0xffffff, 0.8);
@@ -349,7 +364,7 @@ function onClick(event) {
     const intersects = raycaster.intersectObjects([board.mesh, ...blobMeshes]);
 
     if (intersects.length > 0) {
-      intersects.forEach(intersect => {
+      intersects.forEach((intersect) => {
         // hit a tile
         const entity = idToEntity.get(intersect.object.id);
 
@@ -358,9 +373,11 @@ function onClick(event) {
           console.log(entity);
           entity.health -= Fighter.damage;
         }
-      })
-      
-      const [leftBullet, rightBullet] = fighter.fireBulletsAt(intersects[0].point);
+      });
+
+      const [leftBullet, rightBullet] = fighter.fireBulletsAt(
+        intersects[0].point
+      );
       addEntity(leftBullet);
       addEntity(rightBullet);
     } else {
