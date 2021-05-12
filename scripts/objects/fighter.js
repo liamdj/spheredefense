@@ -102,17 +102,17 @@ export class Fighter {
 
   fireBulletsAt = (intersectPoint) => {
     const leftStart = this.planeMesh.localToWorld(
-      new THREE.Vector3(-4, -4, -10)
+      new THREE.Vector3(-8, -4, -12)
     );
     const rightStart = this.planeMesh.localToWorld(
-      new THREE.Vector3(4, -4, -10)
+      new THREE.Vector3(8, -4, -12)
     );
     // adjust bullet direction toward target
     const leftDirection = this.planeMesh
       .localToWorld(
         this.planeMesh
           .worldToLocal(intersectPoint.clone())
-          .add(new THREE.Vector3(-2, -2, 0))
+          .add(new THREE.Vector3(-4, -2, 0))
       )
       .sub(leftStart);
     const leftBullet = new Bullet(leftStart, leftDirection);
@@ -120,7 +120,7 @@ export class Fighter {
       .localToWorld(
         this.planeMesh
           .worldToLocal(intersectPoint.clone())
-          .add(new THREE.Vector3(2, -2, 0))
+          .add(new THREE.Vector3(4, -2, 0))
       )
       .sub(rightStart);
     const rightBullet = new Bullet(rightStart, rightDirection);
@@ -129,10 +129,10 @@ export class Fighter {
 
   fireBulletsDirection = (direction) => {
     const leftStart = this.planeMesh.localToWorld(
-      new THREE.Vector3(-4, -4, -10)
+      new THREE.Vector3(-8, -4, -12)
     );
     const rightStart = this.planeMesh.localToWorld(
-      new THREE.Vector3(4, -4, -10)
+      new THREE.Vector3(8, -4, -12)
     );
     // fire straight in direction
     const adjusted = this.planeMesh
