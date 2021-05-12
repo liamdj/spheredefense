@@ -349,16 +349,18 @@ function onClick(event) {
     const intersects = raycaster.intersectObjects([board.mesh, ...blobMeshes]);
 
     if (intersects.length > 0) {
-      // hit a tile
-      const intersect = intersects[0];
-      const entity = idToEntity.get(intersect.object.id);
+      intersects.forEach(intersect => {
+        // hit a tile
+        const entity = idToEntity.get(intersect.object.id);
 
-      // remove blob hit
-      if (entity.type == "TROOP") {
-        console.log(entity);
-        entity.health -= Fighter.damage;
-      }
-      const [leftBullet, rightBullet] = fighter.fireBulletsAt(intersect.point);
+        // remove blob hit
+        if (entity.type == "TROOP") {
+          console.log(entity);
+          entity.health -= Fighter.damage;
+        }
+      })
+      
+      const [leftBullet, rightBullet] = fighter.fireBulletsAt(intersects[0].point);
       addEntity(leftBullet);
       addEntity(rightBullet);
     } else {
