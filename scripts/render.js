@@ -251,13 +251,6 @@ function init() {
   // world
   scene.background = new THREE.Color(0x1c1c1c);
   scene.fog = new THREE.FogExp2(0x1c1c1c, 0.00001);
-  // scene.fog = new THREE.FogExp2(0x1c1c1c, 0.001);
-
-  const axesHelper = new THREE.AxesHelper(1000);
-  scene.add(axesHelper);
-
-  // const cameraHelper = new THREE.CameraHelper(fighter.camera);
-  // scene.add(cameraHelper);
 
   const stars = {};
   const starArr = [];
@@ -538,10 +531,14 @@ function animate(timeMs) {
 
   if (stats.phase === "build") {
     cameraLight.position.copy(perspectiveCamera.position);
+    selectLines.mesh.visible = true;
+    selectFace.mesh.visible = true;
   } else if (stats.phase === "flight") {
     cameraLight.position.copy(
       fighter.group.localToWorld(fighter.group.position.clone())
     );
+    selectLines.mesh.visible = false;
+    selectFace.mesh.visible = false;
   }
   entities.forEach((obj) => {
     // skip the fighter if in build mode

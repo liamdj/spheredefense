@@ -11,7 +11,7 @@ export class Troop {
     const geometry = new THREE.SphereGeometry(20);
     const material = new THREE.MeshBasicMaterial({
         color: settings.TEAM_2_COLOR,
-        visible: true
+        visible: false
     });
     // copy troop mesh appearance
     this.mesh = new THREE.Mesh(geometry, material);

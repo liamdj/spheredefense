@@ -125,7 +125,7 @@ export class Board {
         childObj = childObj.parent;
         maxCount -= 1;
       }
-      intersect.point.multiply(scale).multiplyScalar(1.01);
+      intersect.point.multiply(scale);
       overlayCentroid = intersect.point;
     } 
     return overlayCentroid;
