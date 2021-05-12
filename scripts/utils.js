@@ -6,7 +6,6 @@ const effects = [];
 export const handleCollisions = (
   objects,
   scene,
-  score,
   time,
   blobMeshes,
   idToEntity
