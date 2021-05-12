@@ -2,11 +2,26 @@
 
 <head>
     <title>Sphere Defense</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link rel="shortcut icon" type="image/jpg" href="favicon.ico"/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
     <style>
         body {
             text-align: center;
             padding: 0;
             margin: 0;
+        }
+        * {
+            font-family: 'Space Mono', monospace;
+        }
+        .dg.ac {
+            position: relative !important; 
+        }
+        .dg.a {
+            float: none !important;
+        }
+        .dg.main.a {
+            margin: 0 auto !important;
         }
 
         #viewcontainer {
@@ -19,6 +34,9 @@
             color: white;
             text-align: left;
             user-select: none;
+        }
+        #optionContainer * {
+            margin: 2em;
         }
     </style>
 </head>
@@ -34,7 +52,7 @@
     <div id="viewcontainer"></div>
     <!--Set initial conditions-->
     <script type='text/javascript'>
-        let startGame;
+        let startGame, showSettings, reload;
         let siteurl = "https://nathanalam.github.io/spheredefense";
         let settings = {
             WORLD_RADIUS: 1000,
@@ -49,10 +67,15 @@
         let stats = {
             score: 0,
             gameover: false,
-            phase: "build"
+            phase: "build",
+            gamerunning: false
         }
     </script>
     <!--Import relevant scripts-->
+    <script
+        src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+        crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
         integrity="sha512-dLxUelApnYxpLt6K2iomGngnHO83iUvZytA3YjDUCjT0HDOHKXnVYdf3hU4JjM8uEhxf9nD1/ey98U3t2vZ0qQ=="
         crossorigin="anonymous"></script>
@@ -61,7 +84,6 @@
     <script src="scripts/lib/OBJLoader.js"></script>
     <script type="text/javascript" src="scripts/lib/dat.gui.min.js"></script>
     <script type="module" src="scripts/lib/toindex.js"></script>
-    <script type="module" src="scripts/gui.js"></script>
     <script type="module" src="scripts/render.js"></script>
 </body>
 

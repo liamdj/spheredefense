@@ -5,15 +5,43 @@ import { Board } from "./objects/board.js";
 import { Tower } from "./objects/tower.js";
 import { Troop } from "./objects/troops.js";
 
-export const loadWorld = (
-  container,
+let container,
   loader,
   audioLoader,
   audioListener,
   callback,
   mtlloader,
-  objLoader
+  objLoader;
+
+export const setVars = (
+  ocontainer,
+  oloader,
+  oaudioLoader,
+  oaudioListener,
+  ocallback,
+  omtlloader,
+  oobjLoader
 ) => {
+  [
+    container,
+    loader,
+    audioLoader,
+    audioListener,
+    callback,
+    mtlloader,
+    objLoader,
+  ] = [
+    ocontainer,
+    oloader,
+    oaudioLoader,
+    oaudioListener,
+    ocallback,
+    omtlloader,
+    oobjLoader,
+  ];
+};
+
+export const loadWorld = () => {
   container.innerHTML = "Loading world...";
   mtlloader.load(
     // resource URL
@@ -29,7 +57,7 @@ export const loadWorld = (
           const object = model;
           object.scale.multiplyScalar(0.03 * settings.WORLD_RADIUS);
           Board.planetModel = object;
-          loadStar(container, loader, audioLoader, audioListener, callback);
+          loadStar();
         },
         // called when loading is in progresses
         function (xhr) {},
@@ -47,7 +75,7 @@ export const loadWorld = (
     }
   );
 };
-const loadStar = (container, loader, audioLoader, audioListener, callback) => {
+const loadStar = () => {
   container.innerHTML = "Loading stars...";
   loader.load(
     // resource URL
@@ -57,7 +85,7 @@ const loadStar = (container, loader, audioLoader, audioListener, callback) => {
       const object = model.scene;
       object.scale.multiplyScalar(100);
       Star.starModel = object;
-      loadPlane(container, loader, audioLoader, audioListener, callback);
+      loadPlane();
     },
     // called when loading is in progresses
     function (xhr) {},
@@ -67,7 +95,7 @@ const loadStar = (container, loader, audioLoader, audioListener, callback) => {
     }
   );
 };
-const loadPlane = (container, loader, audioLoader, audioListener, callback) => {
+const loadPlane = () => {
   container.innerHTML = "Loading plane...";
   loader.load(
     // resource URL
@@ -79,7 +107,7 @@ const loadPlane = (container, loader, audioLoader, audioListener, callback) => {
       object.rotateY(-Math.PI / 2);
       object.position.add(new THREE.Vector3(0, -4, -10));
       Fighter.planeModel = object;
-      loadTower(container, loader, audioLoader, audioListener, callback);
+      loadTower();
     },
     // called when loading is in progresses
     function (xhr) {},
@@ -89,7 +117,7 @@ const loadPlane = (container, loader, audioLoader, audioListener, callback) => {
     }
   );
 };
-const loadTower = (container, loader, audioLoader, audioListener, callback) => {
+const loadTower = () => {
   container.innerHTML = "Loading tower...";
   loader.load(
     // resource URL
@@ -99,7 +127,7 @@ const loadTower = (container, loader, audioLoader, audioListener, callback) => {
       const object = model.scene;
       object.scale.multiplyScalar(500, 500, 500);
       Tower.towerModel = object;
-      loadTurret(container, loader, audioLoader, audioListener, callback);
+      loadTurret();
     },
     // called when loading is in progresses
     function (xhr) {},
@@ -110,13 +138,7 @@ const loadTower = (container, loader, audioLoader, audioListener, callback) => {
   );
 };
 
-const loadTurret = (
-  container,
-  loader,
-  audioLoader,
-  audioListener,
-  callback
-) => {
+const loadTurret = () => {
   container.innerHTML = "Loading turret...";
   loader.load(
     // resource URL
@@ -126,7 +148,7 @@ const loadTurret = (
       const object = model.scene;
       object.scale.multiplyScalar(200, 200, 200);
       Turret.turretModel = object;
-      loadTroop(container, loader, audioLoader, audioListener, callback);
+      loadTroop();
     },
     // called when loading is in progresses
     function (xhr) {},
@@ -137,7 +159,7 @@ const loadTurret = (
   );
 };
 
-const loadTroop = (container, loader, audioLoader, audioListener, callback) => {
+const loadTroop = () => {
   container.innerHTML = "Loading troop...";
   loader.load(
     // resource URL
@@ -147,7 +169,7 @@ const loadTroop = (container, loader, audioLoader, audioListener, callback) => {
       const object = model.scene;
       object.scale.multiplyScalar(50);
       Troop.troopModel = object;
-      loadShots(container, loader, audioLoader, audioListener, callback);
+      loadShots();
     },
     // called when loading is in progresses
     function (xhr) {},
@@ -158,7 +180,7 @@ const loadTroop = (container, loader, audioLoader, audioListener, callback) => {
   );
 };
 
-const loadShots = (container, loader, audioLoader, audioListener, callback) => {
+const loadShots = () => {
   container.innerHTML = "Loading lasers...";
   audioLoader.load(`${siteurl}/sounds/laser.mp3`, function (buffer) {
     const sound = new THREE.Audio(audioListener);
@@ -167,11 +189,11 @@ const loadShots = (container, loader, audioLoader, audioListener, callback) => {
     sound.setVolume(0.5);
     Fighter.shootSound = sound;
     Turret.shootSound = sound;
-    loadPop(container, loader, audioLoader, audioListener, callback);
+    loadPop();
   });
 };
 
-const loadPop = (container, loader, audioLoader, audioListener, callback) => {
+const loadPop = () => {
   container.innerHTML = "Loading misc sounds...";
   audioLoader.load(`${siteurl}/sounds/pop.mp3`, function (buffer) {
     const sound = new THREE.Audio(audioListener);
@@ -180,11 +202,11 @@ const loadPop = (container, loader, audioLoader, audioListener, callback) => {
     sound.setVolume(0.5);
     Troop.hopSound = sound;
     Turret.placeSound = sound;
-    loadSplat(container, loader, audioLoader, audioListener, callback);
+    loadSplat();
   });
 };
 
-const loadSplat = (container, loader, audioLoader, audioListener, callback) => {
+const loadSplat = () => {
   container.innerHTML = "Loading misc sounds...";
   audioLoader.load(`${siteurl}/sounds/splat.mp3`, function (buffer) {
     const sound = new THREE.Audio(audioListener);
@@ -192,6 +214,88 @@ const loadSplat = (container, loader, audioLoader, audioListener, callback) => {
     sound.setLoop(false);
     sound.setVolume(0.5);
     Troop.deathSound = sound;
-    callback();
+    menuScreen();
   });
+};
+
+const menuScreen = () => {
+  $("#viewcontainer").empty();
+  $("#viewcontainer").append(`<h1>Sphere Defense</h2>`);
+  $("#viewcontainer").append(
+    `<img style="width: 30%;" src='images/logo.png' /><br>`
+  );
+  $("#viewcontainer").append(`<h4>Nathan Alam and Liam Johansson</h4>`);
+  $("#viewcontainer").append(`<div id="optionContainer"></div>`);
+  $("#optionContainer").append(
+    "<button onclick='startGame()'>Start Game</button>"
+  );
+  $("#optionContainer").append(
+    "<button onclick='showSettings()'>Settings</button>"
+  );
+  $("#viewcontainer").append(
+    `<a href="https://github.com/nathanalam/spheredefense">See it on Github</a>`
+  );
+};
+
+export const displaySettings = () => {
+  container.append(info);
+  var gui = new dat.GUI();
+
+  var options = {
+    togglePhase: function () {
+      stats.phase = stats.phase == "build" ? "flight" : "build";
+    },
+  };
+
+  gui
+    .add(settings, "SPAWN_FREQUENCY")
+    .min(0)
+    .max(0.05)
+    .step(0.001)
+    .name("Spawn Rate")
+    .listen();
+  gui
+    .add(settings, "MAX_TURRETS")
+    .min(0)
+    .max(30)
+    .step(1)
+    .name("Max Turrets")
+    .listen();
+  gui
+    .add(settings, "ENEMY_SPEED")
+    .min(0)
+    .max(5)
+    .step(0.05)
+    .name("Enemy Speed")
+    .listen();
+  gui
+    .add(settings, "TURRET_RANGE")
+    .min(0)
+    .max(1000)
+    .step(10)
+    .name("Turret Range")
+    .listen();
+  gui
+    .add(settings, "TURRET_DAMAGE")
+    .min(0)
+    .max(100)
+    .step(1)
+    .name("Turret Damage")
+    .listen();
+  gui.add(options, "togglePhase").name("Toggle Phase");
+  $("#viewcontainer").empty();
+  $("#viewcontainer").append(`<div id="optionContainer"></div>`);
+  $("#optionContainer").append("<button onclick='reload()'>Save</button>");
+};
+
+export const appendGUI = () => {
+  console.log("happened");
+  $("#viewcontainer").append(`<div id="info">
+    <h2>Sphere Defense</h2>
+    <p id="student">Nathan Alam and Liam Johansson
+    </p>
+    <p>Score: <span id="score">0</span></p>
+    <p>Available Turrets: <span id="turrets-remaining">5</span></p>
+  </div>
+  `);
 };

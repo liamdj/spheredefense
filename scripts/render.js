@@ -10,7 +10,7 @@ import { HoverLines, SelectFace } from "./objects/selection.js";
 import { Tower } from "./objects/tower.js";
 import { Troop } from "./objects/troops.js";
 import { handleEnemyBehavior } from "./enemy.js";
-import { loadWorld } from "./loading.js";
+import { loadWorld, appendGUI, displaySettings, setVars } from "./loading.js";
 
 let perspectiveCamera,
   board,
@@ -45,11 +45,21 @@ const objLoader = new THREE.OBJLoader();
 const audioLoader = new THREE.AudioLoader();
 audioListener = new THREE.AudioListener();
 
-const menuScreen = () => {
-  container.innerHTML = "<button onclick='startGame()'>Start Game</button>";
+reload = () => {
+  $(".dg").remove();
+  $("#info").remove();
+  stats = {
+    score: 0,
+    gameover: false,
+    phase: "build",
+    gamerunning: false,
+  };
+  loadWorld();
 };
-
+showSettings = displaySettings;
 startGame = () => {
+  appendGUI(container);
+  stats.gamerunning = true;
   board = new Board();
   meshPosition = board.mesh.geometry.attributes.position;
   container.innerHTML = "";
@@ -67,15 +77,16 @@ startGame = () => {
   animate();
 };
 
-loadWorld(
+setVars(
   container,
   loader,
   audioLoader,
   audioListener,
-  menuScreen,
+  startGame,
   mtlloader,
   objLoader
 );
+loadWorld();
 
 function init() {
   const aspect = width / height;
@@ -361,7 +372,7 @@ function clearHighlights() {
 }
 
 function animate(timeMs) {
-  if (stats.gameover) return;
+  if (stats.gameover || !stats.gamerunning) return;
   const time = timeMs * 0.0001;
   requestAnimationFrame(animate);
 
@@ -392,9 +403,9 @@ function animate(timeMs) {
     addEntity(newTroop);
     blobMeshes.push(newTroop.mesh);
   }
-  handleCollisions(entities, scene, score, time, blobMeshes, idToEntity);
-  document.getElementById("turrets-remaining").innerHTML =
-    settings.MAX_TURRETS - turretCount;
+  handleCollisions(entities, scene, time, blobMeshes, idToEntity);
+  if ($("#turrets-remaining").length)
+    $("#turrets-remaining").html(settings.MAX_TURRETS - turretCount);
 
   controls.update();
 
