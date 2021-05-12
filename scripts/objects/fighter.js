@@ -6,7 +6,7 @@ export class Fighter {
   static maxSpeed = 3;
   static acceleration = 0.05;
   static deceleration = 0.1;
-  static damage = 75;
+  static damage = 150;
   static planeModel = new THREE.Object3D();
   static shootSound = new THREE.Audio(new THREE.AudioListener());
 
