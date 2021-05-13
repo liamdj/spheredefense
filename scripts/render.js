@@ -95,7 +95,7 @@ function init() {
   const stars = {};
   const starArr = [];
   const mesh = new THREE.Group();
-  for (let i = 0; i < 500; i++) {
+  for (let i = 0; i < 1000; i++) {
     const star = new Star();
     starArr.push(star);
     mesh.add(star.mesh);
@@ -129,6 +129,9 @@ function init() {
   window.addEventListener("touchend", onClick);
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("keyup", onKeyUp);
+
+  document.getElementById("lives").innerHTML = stats.lives;
+  document.getElementById("score").innerHTML = 0;
 
   createControls(perspectiveCamera);
 

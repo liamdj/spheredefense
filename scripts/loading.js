@@ -248,10 +248,17 @@ export const displaySettings = () => {
   // };
 
   gui
-    .add(settings, "SPAWN_FREQUENCY")
+    .add(settings, "LIVES")
+    .min(1)
+    .max(15)
+    .step(1)
+    .name("Lives")
+    .listen();
+  gui
+    .add(settings, "SPAWN_RATE")
     .min(0)
-    .max(0.05)
-    .step(0.001)
+    .max(1)
+    .step(0.025)
     .name("Spawn Rate")
     .listen();
   gui
@@ -265,42 +272,42 @@ export const displaySettings = () => {
     .add(settings, "ENEMY_SPEED")
     .min(0)
     .max(5)
-    .step(0.05)
+    .step(0.5)
     .name("Enemy Speed")
     .listen();
   gui
     .add(settings, "TURRET_RANGE")
     .min(0)
     .max(1000)
-    .step(10)
+    .step(50)
     .name("Turret Range")
     .listen();
   gui
     .add(settings, "TURRET_DAMAGE")
     .min(0)
-    .max(100)
-    .step(1)
+    .max(200)
+    .step(10)
     .name("Turret Damage")
     .listen();
   gui
     .add(settings, "TURRET_FIRE_RATE")
-    .min(0.1)
+    .min(0.5)
     .max(5)
-    .step(0.25)
+    .step(0.5)
     .name("Fire Rate")
     .listen();
   gui
     .add(settings, "PLANE_DAMAGE")
     .min(0)
     .max(200)
-    .step(2)
+    .step(25)
     .name("Plane Damage")
     .listen();
   gui
     .add(settings, "PLANE_MAX_SPEED")
     .min(1)
     .max(20)
-    .step(0.5)
+    .step(1)
     .name("Plane Speed")
     .listen();
   $("#viewcontainer").empty();
@@ -313,8 +320,9 @@ export const appendGUI = () => {
     <h2>Sphere Defense</h2>
     <p id="student">Nathan Alam and Liam Johansson
     </p>
-    <p>Score: <span id="score">0</span></p>
-    <p>Available Turrets: <span id="turrets-remaining">5</span></p>
+    <p>Lives: <span id="lives"></span></p>
+    <p>Score: <span id="score"></span></p>
+    <p>Available Turrets: <span id="turrets-remaining"></span></p>
   </div>
   `);
 };

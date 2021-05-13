@@ -2,7 +2,7 @@ import { Bullet } from "./bullets.js";
 
 export class Turret {
   static timeOfHop = 0.0001 * 800;
-  static timeBetweenShots = 0.0001 * 800 / settings.TURRET_FIRE_RATE;
+  static timeBetweenShots = 0.0001 * 2000 / settings.TURRET_FIRE_RATE;
   static turretModel = new THREE.Object3D();
   static shootSound = new THREE.Audio(new THREE.AudioListener());
   static placeSound = new THREE.Audio(new THREE.AudioListener());
@@ -17,7 +17,7 @@ export class Turret {
     this.mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
 
     this.timeLastFired = 0;
-
+    this.dead = false;
     this.hopping = false;
     this.hopStartTime = 0;
     this.speed = 1;
@@ -81,7 +81,7 @@ export class Turret {
   };
 
   get isGone() {
-    return this.health <= 0;
+    return this.dead;
   }
 
   attemptFireBullet = (targetPos, time) => {

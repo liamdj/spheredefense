@@ -2,22 +2,26 @@ export class Troop {
   static timeOfHop = 0.0001 * 800;
   static timeBetweenHops = 0.0001 * 4000;
   static dropTime = 600;
+  static range = 50;
+  static maxHealth = 100;
   static dropHeight = settings.WORLD_RADIUS;
   static troopModel = new THREE.Object3D();
   static hopSound = new THREE.Audio(new THREE.AudioListener());
   static deathSound = new THREE.Audio(new THREE.AudioListener());
+  static geometry = new THREE.SphereGeometry(20);
+  static material = new THREE.MeshBasicMaterial({
+    color: settings.ENEMY_COLOR,
+    visible: false
+  });
 
   constructor(tile, time) {
-    const geometry = new THREE.SphereGeometry(20);
-    const material = new THREE.MeshBasicMaterial({
-      color: settings.TEAM_2_COLOR,
-      visible: false
-    });
     // copy troop mesh appearance
-    this.mesh = new THREE.Mesh(geometry, material);
-    this.group = new THREE.Group();
-    this.group.add(Troop.troopModel.clone());
-    this.mesh.add(this.group);
+    this.mesh = new THREE.Group();
+    const sphere = new THREE.Mesh(Troop.geometry, Troop.material);
+    this.mesh.add(sphere);
+    const model = Troop.troopModel.clone();
+    model.position.set(0, 0, -6)
+    this.mesh.add(model);
 
     // set initial tile coordinates
     this.tile = tile;
@@ -28,9 +32,8 @@ export class Troop {
 
     this.speed = settings.ENEMY_SPEED;
     this.health = 100;
-    this.maxHealth = 100;
+    this.size = 1;
     this.type = "TROOP";
-    this.range = 100;
     this.damage = 10;
   }
 
@@ -41,8 +44,14 @@ export class Troop {
   // animate tile to tile movement
   timeStep = (time) => {
     // set size according to health
-    const size = 1.5 + (1 * this.health) / this.maxHealth;
-    this.mesh.scale.set(size, size, size);
+    const frac = this.health / Troop.maxHealth;
+    if (frac < this.size) {
+      this.size = Math.max(this.size - 0.03, frac);
+    } else if (frac > this.size) {
+      this.size = Math.min(this.size + 0.03, frac);
+    }
+    const scale = 0.5 + this.size;
+    this.mesh.scale.set(scale, scale, scale);
 
     if (this.falling) {
       const distVect = new THREE.Vector3(

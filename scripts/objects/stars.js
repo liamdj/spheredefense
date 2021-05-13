@@ -1,13 +1,13 @@
-// DEMO triangles
 export class Star {
   static starModel = new THREE.Object3D();
   constructor() {
-    const spaceRadius = settings.WORLD_RADIUS * 2;
+    const spaceRadius = settings.WORLD_RADIUS * 3;
     this.mesh = new THREE.Object3D();
 
     this.mesh = new THREE.Object3D();
     this.group = new THREE.Group();
     this.group.add(Star.starModel.clone());
+    this.group.scale.multiplyScalar(3);
     this.mesh.add(this.group);
 
     const theta = Math.random() * 2 * Math.PI;
@@ -17,9 +17,9 @@ export class Star {
     this.mesh.position.y = rho * Math.sin(theta) * Math.sin(phi);
     this.mesh.position.z = rho * Math.cos(phi);
     this.mesh.updateMatrix();
-    this.xspeed = Math.random();
-    this.yspeed = Math.random();
-    this.zspeed = Math.random();
+    this.xspeed = 6 * Math.random();
+    this.yspeed = 6 * Math.random();
+    this.zspeed = 6 * Math.random();
   }
   timeStep = (time) => {
     this.mesh.rotation.x = time * this.xspeed;

@@ -11,18 +11,14 @@ export class Tower {
     this.mesh.add(this.group);
     this.mesh.position.copy(tile.centroid);
     this.mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), normal);
+    this.mesh.scale.multiplyScalar(1.5);
 
     this.type = "TOWER";
-    this.health = 1000;
-    this.maxHealth = 1000;
   }
 
   get isGone() {
-    return this.health <= 0;
+    return stats.lives <= 0;
   }
 
-  timeStep = (time) => {
-    const size = 0.25 + (0.75 * this.health) / this.maxHealth;
-    this.mesh.scale.set(size, size, size);
-  };
+  timeStep = (time) => { };
 }
