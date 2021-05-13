@@ -1,15 +1,16 @@
 class Particle {
-  static geometry = new THREE.TetrahedronGeometry(4, 0);
+  static geometryS = new THREE.TetrahedronGeometry(3, 0);
+  static geometryL = new THREE.TetrahedronGeometry(5, 0);
   static material = new THREE.MeshLambertMaterial({
     color: settings.TEAM_2_COLOR,
   });
 
-  constructor(time, normal) {
-    this.mesh = new THREE.Mesh(Particle.geometry, Particle.material);
+  constructor(time, normal, large) {
+    this.mesh = large ? new THREE.Mesh(Particle.geometryL, Particle.material) : new THREE.Mesh(Particle.geometryS, Particle.material);
     this.startTime = time;
     this.endTime = time + 0.0001 * 1000 * (1 + Math.random());
     this.direction = new THREE.Vector3().random().add(normal).normalize();
-    this.speed = 40 * (2 + Math.random());
+    this.speed = (large ? 45 : 30) * (2 + Math.random());
   }
 
   timeStep = (time) => {
@@ -23,12 +24,13 @@ class Particle {
 }
 
 export class Explosion {
-  constructor(position, normal, time) {
+  constructor(position, normal, time, large) {
     this.particles = [];
     this.mesh = new THREE.Group();
     this.mesh.position.copy(position);
-    for (let i = 0; i < 20; i++) {
-      const particle = new Particle(time, normal);
+    const num = large ? 20 : 10;
+    for (let i = 0; i < num; i++) {
+      const particle = new Particle(time, normal, large);
       this.particles.push(particle);
       this.mesh.add(particle.mesh);
     }

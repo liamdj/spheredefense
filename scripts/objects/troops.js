@@ -10,8 +10,8 @@ export class Troop {
   constructor(tile, time) {
     const geometry = new THREE.SphereGeometry(20);
     const material = new THREE.MeshBasicMaterial({
-        color: settings.TEAM_2_COLOR,
-        visible: false
+      color: settings.TEAM_2_COLOR,
+      visible: false
     });
     // copy troop mesh appearance
     this.mesh = new THREE.Mesh(geometry, material);
@@ -41,7 +41,7 @@ export class Troop {
   // animate tile to tile movement
   timeStep = (time) => {
     // set size according to health
-    const size = 0.25 + (0.75 * this.health) / this.maxHealth;
+    const size = 1.5 + (1 * this.health) / this.maxHealth;
     this.mesh.scale.set(size, size, size);
 
     if (this.falling) {
@@ -75,7 +75,7 @@ export class Troop {
         this.hopping = false;
         this.waitTimeStart = time;
         this.health += 40;
-        Troop.hopSound.play();
+        // Troop.hopSound.play();
       }
     } else if (
       (time - this.waitTimeStart) * this.speed >= Troop.timeBetweenHops &&
