@@ -3,10 +3,10 @@ import { Crosshairs } from "./Crosshairs.js";
 
 export class Fighter {
   static minSpeed = 1;
-  static maxSpeed = 3;
+  static maxSpeed = settings.PLANE_MAX_SPEED;
   static acceleration = 0.05;
   static deceleration = 0.1;
-  static damage = 150;
+  static damage = settings.PLANE_DAMAGE;
   static planeModel = new THREE.Object3D();
   static shootSound = new THREE.Audio(new THREE.AudioListener());
 
@@ -20,7 +20,7 @@ export class Fighter {
 
     this.angularVel = new THREE.Vector3();
     this.speed = 0.5;
-    this.breaking = true;
+    this.breaking = false;
 
     // object exists in world coordinates (center at orign)
     this.mesh = new THREE.Object3D();
@@ -53,7 +53,6 @@ export class Fighter {
     this.angularVel.set(2.5 * screenVec.y, -1 * screenVec.x, 0);
   };
 
-  // this must be the longest I've ever spent on 15 lines of code
   timeStep = (time) => {
     if (this.breaking) {
       this.speed -= Fighter.deceleration;

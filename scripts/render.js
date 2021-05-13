@@ -1,8 +1,8 @@
 import { handleCollisions } from "./utils.js";
 import { Fighter } from "./objects/fighter.js";
-import { Explosion } from "./objects/particles.js";
 import { checkNewEnemy } from "./enemy.js";
 import { Turret } from "./objects/turret.js";
+import { Explosion } from "./objects/particles.js"
 import { Star } from "./objects/stars.js";
 import { TrackballControls } from "./lib/TrackBallControls.js";
 import { Board } from "./objects/board.js";
@@ -30,7 +30,8 @@ let perspectiveCamera,
   selectLines,
   selectFace,
   audioListener,
-  meshPosition;
+  meshPosition,
+  lastTime;
 
 turretCount = 0;
 
@@ -107,12 +108,12 @@ function init() {
   [fighter, stars, board, selectLines, selectFace, tower].forEach(addEntity);
 
   // lights
-  cameraLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  cameraLight = new THREE.DirectionalLight(0xffffff, 1.5);
   cameraLight.position.copy(perspectiveCamera.position);
   cameraLight.target.position.set(0, 0, 0);
   scene.add(cameraLight);
 
-  const ambientLight = new THREE.AmbientLight(0x222222);
+  const ambientLight = new THREE.AmbientLight(0x555555);
   scene.add(ambientLight);
 
   // renderer
@@ -175,7 +176,7 @@ function onPointerMove(event) {
       fighter.crosshairs.sprite.visible = false;
       const scalar = Math.sqrt(
         distSqFromCirc /
-          ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
+        ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
       );
       fighter.updateVelocity(
         pointer.clone().normalize().multiplyScalar(scalar)
@@ -185,35 +186,33 @@ function onPointerMove(event) {
 }
 
 function onClick(event) {
-  if (stats.phase === "flight") {
+  if (stats.phase === "flight" && fighter.angularVel.x == 0 && fighter.angularVel.y == 0) {
     Fighter.shootSound.play();
-    const aimingToward =
-      fighter.angularVel.x == 0 && fighter.angularVel.y == 0
-        ? pointer
-        : new THREE.Vector2(0, 0);
-    raycaster.setFromCamera(aimingToward, fighter.camera);
+    raycaster.setFromCamera(pointer, fighter.camera);
 
     const intersects = raycaster.intersectObjects([board.mesh, ...blobMeshes]);
 
+
+    for (let inter of intersects) {
+      const entity = idToEntity.get(inter.object.id);
+
+      // remove blob hit
+      if (entity.type == "TROOP") {
+        entity.health -= Fighter.damage;
+        const explosion = new Explosion(inter.point, inter.point.clone().normalize(), lastTime, false);
+        addEntity(explosion);
+      }
+      else { break; }
+    }
+
     if (intersects.length > 0) {
-      intersects.forEach((intersect) => {
-        // hit a tile
-        const entity = idToEntity.get(intersect.object.id);
-
-        // remove blob hit
-        if (entity.type == "TROOP") {
-          console.log(entity);
-          entity.health -= Fighter.damage;
-        }
-      });
-
       const [leftBullet, rightBullet] = fighter.fireBulletsAt(
         intersects[0].point
       );
       addEntity(leftBullet);
       addEntity(rightBullet);
     } else {
-      const vector = new THREE.Vector3(aimingToward.x, aimingToward.y, -1);
+      const vector = new THREE.Vector3(pointer.x, pointer.y, -1);
       vector.unproject(fighter.camera);
       fighter.group.worldToLocal(vector);
       const [leftBullet, rightBullet] = fighter.fireBulletsDirection(vector);
@@ -366,6 +365,7 @@ function clearHighlights() {
 function animate(timeMs) {
   if (stats.gameover) return;
   const time = timeMs * 0.0001;
+  lastTime = time;
   requestAnimationFrame(animate);
 
   if (stats.phase === "build") {
@@ -387,7 +387,6 @@ function animate(timeMs) {
 
   // game logic
   if (stats.phase === "build") {
-    fighter.breaking = true;
     fighter.crosshairs.sprite.visible = false;
   }
   const newTroop = checkNewEnemy(time, board.tiles);
