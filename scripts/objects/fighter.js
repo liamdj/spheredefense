@@ -4,7 +4,7 @@ import { Crosshairs } from "./Crosshairs.js";
 export class Fighter {
   static minSpeed = 1;
   static maxSpeed = settings.PLANE_MAX_SPEED;
-  static acceleration = 0.05;
+  static acceleration = 0.1;
   static deceleration = 0.1;
   static damage = settings.PLANE_DAMAGE;
   static planeModel = new THREE.Object3D();
@@ -19,7 +19,7 @@ export class Fighter {
     const viewDirection = new THREE.Vector3(0, 0, -1);
 
     this.angularVel = new THREE.Vector3();
-    this.speed = 0.5;
+    this.speed = Fighter.maxSpeed;
     this.breaking = false;
 
     // object exists in world coordinates (center at orign)
@@ -30,14 +30,13 @@ export class Fighter {
     this.group = new THREE.Group();
     this.group.position.copy(initialPosition);
     this.group.rotation.set(0, 0, 0, "ZYX");
-    // group.castShadow = true;
 
     // plane can roll while camera stays fixed
     this.planeMesh = new THREE.Group();
     this.planeMesh.position.set(0, -2, 0);
     this.planeMesh.add(Fighter.planeModel);
 
-    this.camera = new THREE.PerspectiveCamera(80, aspect, 1, 1200);
+    this.camera = new THREE.PerspectiveCamera(75, aspect, 1, 3000);
     this.camera.lookAt(viewDirection);
     this.group.add(this.camera);
 

@@ -2,7 +2,7 @@ class Particle {
   static geometryS = new THREE.TetrahedronGeometry(3, 0);
   static geometryL = new THREE.TetrahedronGeometry(5, 0);
   static material = new THREE.MeshLambertMaterial({
-    color: settings.TEAM_2_COLOR,
+    color: settings.ENEMY_COLOR,
   });
 
   constructor(time, normal, large) {
@@ -28,7 +28,7 @@ export class Explosion {
     this.particles = [];
     this.mesh = new THREE.Group();
     this.mesh.position.copy(position);
-    const num = large ? 20 : 10;
+    const num = large ? 24 : 8;
     for (let i = 0; i < num; i++) {
       const particle = new Particle(time, normal, large);
       this.particles.push(particle);

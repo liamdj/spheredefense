@@ -51,29 +51,32 @@
     <h2>Sphere Defense</h2>
     <p id="student">Nathan Alam and Liam Johansson
     <p>
-    <p>Score: <span id="score">0</span></p>
-    <p>Available Turrets: <span id="turrets-remaining">5</span></p>
+    <p>Lives: <span id="lives"></span></p>
+    <p>Score: <span id="score"></span></p>
+    <p>Available Turrets: <span id="turrets-remaining"></span></p>
   </div>
   <div id="viewcontainer"></div>
   <!--Set initial conditions-->
   <script type='text/javascript'>
     let startGame, showSettings, reload;
-    let siteurl = "https://nathanalam.github.io/spheredefense";
+    const siteurl = "https://nathanalam.github.io/spheredefense";
     let settings = {
       WORLD_RADIUS: 1000,
       TEAM_1_COLOR: 0xff0000,
-      TEAM_2_COLOR: 0x0000ff,
+      ENEMY_COLOR: 0x48c5d9,
+      LIVES: 5,
       MAX_TURRETS: 3,
       ENEMY_SPEED: 1,
-      SPAWN_FREQUENCY: 0.01,
+      SPAWN_RATE: 0.1,
       TURRET_DAMAGE: 40,
-      TURRET_RANGE: 400,
-      TURRET_FIRE_RATE: 1,
+      TURRET_RANGE: 300,
+      TURRET_FIRE_RATE: 2,
       PLANE_DAMAGE: 75,
-      PLANE_MAX_SPEED: 4
+      PLANE_MAX_SPEED: 6
     }
     let stats = {
       score: 0,
+      lives: settings.LIVES,
       gameover: false,
       phase: "build"
     }

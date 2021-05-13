@@ -1,8 +1,6 @@
 import { Explosion } from "./objects/particles.js";
 import { Troop } from "./objects/troops.js";
 
-const effects = [];
-
 export const handleCollisions = (
   objects,
   scene,
@@ -22,12 +20,18 @@ export const handleCollisions = (
             target = mesh;
             targetDist = dist;
           }
+          if (dist < Troop.range) {
+            object.dead = true;
+          }
         });
         if (target != null) {
           const bullet = object.attemptFireBullet(target.position, time);
           if (bullet) {
             objects.push(bullet);
             scene.add(bullet.mesh);
+            const explosion = new Explosion(target.position, target.position.clone().normalize(), time, false);
+            objects.push(explosion);
+            scene.add(explosion.mesh);
             const blob = idToEntity.get(target.id);
             blob.health -= object.damage;
           }
@@ -35,12 +39,14 @@ export const handleCollisions = (
       }
     }
 
-    // tower takes damage from all nearby troops
+    // loses a life for each blob at tower
     if (object.type == "TOWER") {
       blobMeshes.forEach((mesh) => {
         const blob = idToEntity.get(mesh.id);
-        if (object.mesh.position.distanceTo(mesh.position) < blob.range) {
-          object.health -= blob.damage;
+        if (object.mesh.position.distanceTo(mesh.position) < Troop.range) {
+          stats.lives--;
+          document.getElementById("lives").innerHTML = stats.lives;
+          blob.health = -1;
         }
       });
     }
@@ -54,8 +60,8 @@ export const handleCollisions = (
         objects.forEach((obj) => {
           scene.remove(obj);
         });
-        alert("Game Over...");
         stats.gameover = true;
+        alert("Game Over...");
       }
       // if we remove a troop, increment score and add visual effect
       if (object.type == "TROOP") {
