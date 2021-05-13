@@ -166,7 +166,7 @@ function onPointerMove(event) {
   if (stats.phase === "flight") {
     const distSqFromCenter =
       (event.clientX - width / 2) ** 2 + (event.clientY - height / 2) ** 2;
-    const radius = 0.25 * Math.min(width, height);
+    const radius = 0.2 * Math.min(width, height);
     const distSqFromCirc = distSqFromCenter - radius ** 2;
     if (distSqFromCirc <= 0) {
       const vector = new THREE.Vector3(pointer.x, pointer.y, -1);
@@ -384,7 +384,7 @@ function animate(timeMs) {
   }
   entities.forEach((obj) => {
     // skip the fighter if in build mode
-    if ((stats.phase !== "flight") & (obj == fighter)) return;
+    if ((stats.phase !== "flight") && (obj == fighter)) return;
     obj.timeStep(time);
   });
 
