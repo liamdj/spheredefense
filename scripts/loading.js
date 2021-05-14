@@ -221,7 +221,7 @@ const loadSplat = () => {
   });
 };
 
-const menuScreen = () => {
+export const menuScreen = () => {
   $("#viewcontainer").empty();
   $("#viewcontainer").append(`<h1>Sphere Defense</h2>`);
   $("#viewcontainer").append(
@@ -256,74 +256,72 @@ showInstructions = () => {
 
 export const displaySettings = () => {
   container.append(info);
-  var gui = new dat.GUI();
 
-  // var options = {
-  //   togglePhase: function () {
-  //     stats.phase = stats.phase == "build" ? "flight" : "build";
-  //   },
-  // };
+  if ($(".dg").length == 0) {
+    var gui = new dat.GUI();
+    gui.add(settings, "LIVES").min(1).max(15).step(1).name("Lives").listen();
+    gui
+      .add(settings, "SPAWN_RATE")
+      .min(0)
+      .max(1)
+      .step(0.05)
+      .name("Spawn Rate")
+      .listen();
+    gui
+      .add(settings, "MAX_TURRETS")
+      .min(0)
+      .max(30)
+      .step(1)
+      .name("Max Turrets")
+      .listen();
+    gui
+      .add(settings, "ENEMY_SPEED")
+      .min(0)
+      .max(5)
+      .step(0.5)
+      .name("Enemy Speed")
+      .listen();
+    gui
+      .add(settings, "TURRET_RANGE")
+      .min(0)
+      .max(1000)
+      .step(50)
+      .name("Turret Range")
+      .listen();
+    gui
+      .add(settings, "TURRET_DAMAGE")
+      .min(0)
+      .max(200)
+      .step(10)
+      .name("Turret Damage")
+      .listen();
+    gui
+      .add(settings, "TURRET_FIRE_RATE")
+      .min(0.5)
+      .max(5)
+      .step(0.5)
+      .name("Fire Rate")
+      .listen();
+    gui
+      .add(settings, "PLANE_DAMAGE")
+      .min(0)
+      .max(200)
+      .step(25)
+      .name("Plane Damage")
+      .listen();
+    gui
+      .add(settings, "PLANE_MAX_SPEED")
+      .min(1)
+      .max(20)
+      .step(1)
+      .name("Plane Speed")
+      .listen();
+  }
 
-  gui.add(settings, "LIVES").min(1).max(15).step(1).name("Lives").listen();
-  gui
-    .add(settings, "SPAWN_RATE")
-    .min(0)
-    .max(1)
-    .step(0.025)
-    .name("Spawn Rate")
-    .listen();
-  gui
-    .add(settings, "MAX_TURRETS")
-    .min(0)
-    .max(30)
-    .step(1)
-    .name("Max Turrets")
-    .listen();
-  gui
-    .add(settings, "ENEMY_SPEED")
-    .min(0)
-    .max(5)
-    .step(0.5)
-    .name("Enemy Speed")
-    .listen();
-  gui
-    .add(settings, "TURRET_RANGE")
-    .min(0)
-    .max(1000)
-    .step(50)
-    .name("Turret Range")
-    .listen();
-  gui
-    .add(settings, "TURRET_DAMAGE")
-    .min(0)
-    .max(200)
-    .step(10)
-    .name("Turret Damage")
-    .listen();
-  gui
-    .add(settings, "TURRET_FIRE_RATE")
-    .min(0.5)
-    .max(5)
-    .step(0.5)
-    .name("Fire Rate")
-    .listen();
-  gui
-    .add(settings, "PLANE_DAMAGE")
-    .min(0)
-    .max(200)
-    .step(25)
-    .name("Plane Damage")
-    .listen();
-  gui
-    .add(settings, "PLANE_MAX_SPEED")
-    .min(1)
-    .max(20)
-    .step(1)
-    .name("Plane Speed")
-    .listen();
   $("#viewcontainer").empty();
   $("#viewcontainer").append(`<div id="optionContainer"></div>`);
   $("#optionContainer").append("<button onclick='reload()'>Save</button>");
+  $(".dg").show();
 };
 
 export const appendGUI = () => {
