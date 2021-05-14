@@ -349,11 +349,11 @@ function onKeyDown(event) {
     if (event.code === "Space") {
       fighter.breaking = true;
     }
-    if (event.code === "Tab") {
+    if (event.code === "ShiftLeft" || event.code === "ShiftRight") {
       stats.phase = "build";
     }
   } else {
-    if (event.code === "Tab") {
+    if (event.code === "ShiftLeft" || event.code === "ShiftRight") {
       stats.phase = "flight";
     }
   }
