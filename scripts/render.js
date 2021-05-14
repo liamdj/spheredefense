@@ -35,7 +35,7 @@ let perspectiveCamera,
   selectFace,
   audioListener,
   meshPosition,
-  lastTime;
+  lastTime = 0;
 
 turretCount = 0;
 
@@ -183,7 +183,7 @@ function onPointerMove(event) {
       fighter.crosshairs.sprite.visible = false;
       const scalar = Math.sqrt(
         distSqFromCirc /
-          ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
+        ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
       );
       fighter.updateVelocity(
         pointer.clone().normalize().multiplyScalar(scalar)
@@ -196,7 +196,8 @@ function onClick(event) {
   if (
     stats.phase === "flight" &&
     fighter.angularVel.x == 0 &&
-    fighter.angularVel.y == 0
+    fighter.angularVel.y == 0 &&
+    fighter.timeLastFired + Fighter.timeBetweenShots < lastTime
   ) {
     Fighter.shootSound.play();
     raycaster.setFromCamera(pointer, fighter.camera);
@@ -223,7 +224,7 @@ function onClick(event) {
 
     if (intersects.length > 0) {
       const [leftBullet, rightBullet] = fighter.fireBulletsAt(
-        intersects[0].point
+        intersects[0].point, lastTime
       );
       addEntity(leftBullet);
       addEntity(rightBullet);
@@ -231,7 +232,7 @@ function onClick(event) {
       const vector = new THREE.Vector3(pointer.x, pointer.y, -1);
       vector.unproject(fighter.camera);
       fighter.group.worldToLocal(vector);
-      const [leftBullet, rightBullet] = fighter.fireBulletsDirection(vector);
+      const [leftBullet, rightBullet] = fighter.fireBulletsDirection(vector, lastTime);
       addEntity(leftBullet);
       addEntity(rightBullet);
     }

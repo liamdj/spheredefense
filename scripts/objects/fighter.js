@@ -9,6 +9,7 @@ export class Fighter {
   static damage = settings.PLANE_DAMAGE;
   static planeModel = new THREE.Object3D();
   static shootSound = new THREE.Audio(new THREE.AudioListener());
+  static timeBetweenShots = 0.0001 * 250;
 
   constructor(aspect) {
     const initialPosition = new THREE.Vector3(
@@ -21,6 +22,7 @@ export class Fighter {
     this.angularVel = new THREE.Vector3();
     this.speed = Fighter.maxSpeed;
     this.breaking = false;
+    this.timeLastFired = 0;
 
     // object exists in world coordinates (center at orign)
     this.mesh = new THREE.Object3D();
@@ -98,7 +100,8 @@ export class Fighter {
     );
   };
 
-  fireBulletsAt = (intersectPoint) => {
+  fireBulletsAt = (intersectPoint, time) => {
+    this.timeLastFired = time;
     const leftStart = this.planeMesh.localToWorld(
       new THREE.Vector3(-8, -4, -12)
     );
@@ -125,7 +128,8 @@ export class Fighter {
     return [leftBullet, rightBullet];
   };
 
-  fireBulletsDirection = (direction) => {
+  fireBulletsDirection = (direction, time) => {
+    this.timeLastFired = time;
     const leftStart = this.planeMesh.localToWorld(
       new THREE.Vector3(-8, -4, -12)
     );
