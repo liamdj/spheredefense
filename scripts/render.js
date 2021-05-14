@@ -5,15 +5,19 @@ import { Turret } from "./objects/turret.js";
 import { Explosion } from "./objects/particles.js";
 import { Star } from "./objects/stars.js";
 import { TrackballControls } from "./lib/TrackBallControls.js";
-import { Board } from "./objects/board.js";
 import { HoverLines, SelectFace } from "./objects/selection.js";
 import { Tower } from "./objects/tower.js";
 import { Troop } from "./objects/troops.js";
 import { handleEnemyBehavior } from "./enemy.js";
-import { loadWorld, appendGUI, displaySettings, setVars } from "./loading.js";
+import {
+  loadWorld,
+  appendGUI,
+  displaySettings,
+  setVars,
+  board,
+} from "./loading.js";
 
 let perspectiveCamera,
-  board,
   controls,
   scene,
   renderer,
@@ -54,7 +58,6 @@ showSettings = displaySettings;
 startGame = () => {
   container.innerHTML = "";
   appendGUI(container);
-  board = new Board();
   meshPosition = board.mesh.geometry.attributes.position;
   fighter = new Fighter(width / height);
   tower = new Tower(board.tiles[0]);

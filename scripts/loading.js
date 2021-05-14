@@ -13,6 +13,8 @@ let container,
   mtlloader,
   objLoader;
 
+export let board;
+
 export const setVars = (
   ocontainer,
   oloader,
@@ -57,6 +59,7 @@ export const loadWorld = () => {
           const object = model;
           object.scale.multiplyScalar(0.03 * settings.WORLD_RADIUS);
           Board.planetModel = object;
+          board = new Board();
           loadStar();
         },
         // called when loading is in progresses
