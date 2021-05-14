@@ -31,14 +31,14 @@ export const setVars = (
     mtlloader,
     objLoader,
   ] = [
-      ocontainer,
-      oloader,
-      oaudioLoader,
-      oaudioListener,
-      ocallback,
-      omtlloader,
-      oobjLoader,
-    ];
+    ocontainer,
+    oloader,
+    oaudioLoader,
+    oaudioListener,
+    ocallback,
+    omtlloader,
+    oobjLoader,
+  ];
 };
 
 export const loadWorld = () => {
@@ -60,7 +60,7 @@ export const loadWorld = () => {
           loadStar();
         },
         // called when loading is in progresses
-        function (xhr) { },
+        function (xhr) {},
         // called when loading has errors
         function (error) {
           console.log("An error occured while loading world");
@@ -68,7 +68,7 @@ export const loadWorld = () => {
       );
     },
     // called when loading is in progresses
-    function (xhr) { },
+    function (xhr) {},
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading world");
@@ -88,7 +88,7 @@ const loadStar = () => {
       loadPlane();
     },
     // called when loading is in progresses
-    function (xhr) { },
+    function (xhr) {},
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading stars");
@@ -110,7 +110,7 @@ const loadPlane = () => {
       loadTower();
     },
     // called when loading is in progresses
-    function (xhr) { },
+    function (xhr) {},
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading plane");
@@ -130,7 +130,7 @@ const loadTower = () => {
       loadTurret();
     },
     // called when loading is in progresses
-    function (xhr) { },
+    function (xhr) {},
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading tower");
@@ -151,7 +151,7 @@ const loadTurret = () => {
       loadTroop();
     },
     // called when loading is in progresses
-    function (xhr) { },
+    function (xhr) {},
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading turret");
@@ -172,7 +172,7 @@ const loadTroop = () => {
       loadShots();
     },
     // called when loading is in progresses
-    function (xhr) { },
+    function (xhr) {},
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading troop");
@@ -247,13 +247,7 @@ export const displaySettings = () => {
   //   },
   // };
 
-  gui
-    .add(settings, "LIVES")
-    .min(1)
-    .max(15)
-    .step(1)
-    .name("Lives")
-    .listen();
+  gui.add(settings, "LIVES").min(1).max(15).step(1).name("Lives").listen();
   gui
     .add(settings, "SPAWN_RATE")
     .min(0)

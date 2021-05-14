@@ -15,7 +15,10 @@ export class Bullet {
     }
     this.direction = direction.clone().normalize();
     this.mesh.position.copy(startPosition);
-    this.mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, -1), this.direction);
+    this.mesh.quaternion.setFromUnitVectors(
+      new THREE.Vector3(0, 0, -1),
+      this.direction
+    );
     this.mesh.position.addScaledVector(this.direction, 100);
   }
 

@@ -15,7 +15,9 @@ export const handleCollisions = (
         let target = null;
         let targetDist = object.range;
         blobSpheres.forEach((sphere) => {
-          const dist = object.mesh.position.distanceTo(sphere.getWorldPosition(new THREE.Vector3()));
+          const dist = object.mesh.position.distanceTo(
+            sphere.getWorldPosition(new THREE.Vector3())
+          );
           if (dist < targetDist) {
             target = sphere;
             targetDist = dist;
@@ -30,7 +32,12 @@ export const handleCollisions = (
           if (bullet) {
             objects.push(bullet);
             scene.add(bullet.mesh);
-            const explosion = new Explosion(pos, pos.clone().normalize(), time, false);
+            const explosion = new Explosion(
+              pos,
+              pos.clone().normalize(),
+              time,
+              false
+            );
             objects.push(explosion);
             scene.add(explosion.mesh);
             const blob = idToBlob.get(target.id);
@@ -44,7 +51,11 @@ export const handleCollisions = (
     if (object.type == "TOWER") {
       blobSpheres.forEach((sphere) => {
         const blob = idToBlob.get(sphere.id);
-        if (object.mesh.position.distanceTo(sphere.getWorldPosition(new THREE.Vector3())) < Troop.range) {
+        if (
+          object.mesh.position.distanceTo(
+            sphere.getWorldPosition(new THREE.Vector3())
+          ) < Troop.range
+        ) {
           stats.lives--;
           document.getElementById("lives").innerHTML = stats.lives;
           blob.health = -1;
@@ -74,7 +85,12 @@ export const handleCollisions = (
         Troop.deathSound.play();
         document.getElementById("score").innerHTML = stats.score;
         const pos = object.mesh.position;
-        const explosion = new Explosion(pos, pos.clone().normalize(), time, true);
+        const explosion = new Explosion(
+          pos,
+          pos.clone().normalize(),
+          time,
+          true
+        );
         objects.push(explosion);
         scene.add(explosion.mesh);
       }

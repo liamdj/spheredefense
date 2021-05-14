@@ -11,7 +11,7 @@ export class Troop {
   static geometry = new THREE.SphereGeometry(20);
   static material = new THREE.MeshBasicMaterial({
     color: settings.ENEMY_COLOR,
-    visible: false
+    visible: false,
   });
 
   constructor(tile, time) {
@@ -20,7 +20,7 @@ export class Troop {
     this.sphere = new THREE.Mesh(Troop.geometry, Troop.material);
     this.mesh.add(this.sphere);
     const model = Troop.troopModel.clone();
-    model.position.set(0, 0, -6)
+    model.position.set(0, 0, -6);
     this.mesh.add(model);
 
     // set initial tile coordinates

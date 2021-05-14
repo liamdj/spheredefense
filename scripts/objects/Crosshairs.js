@@ -1,6 +1,8 @@
 export class Crosshairs {
   constructor() {
-    const map = new THREE.TextureLoader().load(`${siteurl}/images/crosshairs.png`);
+    const map = new THREE.TextureLoader().load(
+      `${siteurl}/images/crosshairs.png`
+    );
     const material = new THREE.SpriteMaterial({ map: map });
     this.sprite = new THREE.Sprite(material);
     this.sprite.scale.set(0.25, 0.25, 1);

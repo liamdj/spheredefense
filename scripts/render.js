@@ -2,7 +2,7 @@ import { handleCollisions } from "./utils.js";
 import { Fighter } from "./objects/fighter.js";
 import { checkNewEnemy } from "./enemy.js";
 import { Turret } from "./objects/turret.js";
-import { Explosion } from "./objects/particles.js"
+import { Explosion } from "./objects/particles.js";
 import { Star } from "./objects/stars.js";
 import { TrackballControls } from "./lib/TrackBallControls.js";
 import { Board } from "./objects/board.js";
@@ -180,7 +180,7 @@ function onPointerMove(event) {
       fighter.crosshairs.sprite.visible = false;
       const scalar = Math.sqrt(
         distSqFromCirc /
-        ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
+          ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
       );
       fighter.updateVelocity(
         pointer.clone().normalize().multiplyScalar(scalar)
@@ -190,12 +190,15 @@ function onPointerMove(event) {
 }
 
 function onClick(event) {
-  if (stats.phase === "flight" && fighter.angularVel.x == 0 && fighter.angularVel.y == 0) {
+  if (
+    stats.phase === "flight" &&
+    fighter.angularVel.x == 0 &&
+    fighter.angularVel.y == 0
+  ) {
     Fighter.shootSound.play();
     raycaster.setFromCamera(pointer, fighter.camera);
 
     const intersects = raycaster.intersectObjects([board.mesh, ...blobSpheres]);
-
 
     for (let inter of intersects) {
       const entity = idToBlobs.get(inter.object.id);
@@ -203,10 +206,16 @@ function onClick(event) {
       // remove blob hit
       if (entity) {
         entity.health -= Fighter.damage;
-        const explosion = new Explosion(inter.point, inter.point.clone().normalize(), lastTime, false);
+        const explosion = new Explosion(
+          inter.point,
+          inter.point.clone().normalize(),
+          lastTime,
+          false
+        );
         addEntity(explosion);
+      } else {
+        break;
       }
-      else { break; }
     }
 
     if (intersects.length > 0) {
@@ -385,7 +394,7 @@ function animate(timeMs) {
   }
   entities.forEach((obj) => {
     // skip the fighter if in build mode
-    if ((stats.phase !== "flight") && (obj == fighter)) return;
+    if (stats.phase !== "flight" && obj == fighter) return;
     obj.timeStep(time);
   });
 

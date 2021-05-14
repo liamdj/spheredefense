@@ -20,5 +20,5 @@ export class Tower {
     return stats.lives <= 0;
   }
 
-  timeStep = (time) => { };
+  timeStep = (time) => {};
 }
