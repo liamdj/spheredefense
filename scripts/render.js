@@ -11,6 +11,7 @@ import { Troop } from "./objects/troops.js";
 import { handleEnemyBehavior } from "./enemy.js";
 import {
   loadWorld,
+  menuScreen,
   appendGUI,
   displaySettings,
   setVars,
@@ -51,13 +52,14 @@ const audioLoader = new THREE.AudioLoader();
 audioListener = new THREE.AudioListener();
 
 reload = () => {
+  menuScreen();
+  appendGUI();
   $(".dg").remove();
-  loadWorld();
 };
 showSettings = displaySettings;
 startGame = () => {
   container.innerHTML = "";
-  appendGUI(container);
+  appendGUI();
   meshPosition = board.mesh.geometry.attributes.position;
   fighter = new Fighter(width / height);
   tower = new Tower(board.tiles[0]);
@@ -224,7 +226,8 @@ function onClick(event) {
 
     if (intersects.length > 0) {
       const [leftBullet, rightBullet] = fighter.fireBulletsAt(
-        intersects[0].point, lastTime
+        intersects[0].point,
+        lastTime
       );
       addEntity(leftBullet);
       addEntity(rightBullet);
@@ -232,7 +235,10 @@ function onClick(event) {
       const vector = new THREE.Vector3(pointer.x, pointer.y, -1);
       vector.unproject(fighter.camera);
       fighter.group.worldToLocal(vector);
-      const [leftBullet, rightBullet] = fighter.fireBulletsDirection(vector, lastTime);
+      const [leftBullet, rightBullet] = fighter.fireBulletsDirection(
+        vector,
+        lastTime
+      );
       addEntity(leftBullet);
       addEntity(rightBullet);
     }
