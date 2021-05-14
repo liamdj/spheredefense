@@ -230,10 +230,24 @@ const menuScreen = () => {
     "<button onclick='startGame()'>Start Game</button>"
   );
   $("#optionContainer").append(
+    `<button id="instructions" onclick='showInstructions()'>Show Instructions</button>`
+  );
+  $("#optionContainer").append(
     "<button onclick='showSettings()'>Settings</button>"
   );
   $("#viewcontainer").append(
     `<a href="https://github.com/nathanalam/spheredefense">See it on Github</a>`
+  );
+};
+
+showInstructions = () => {
+  $("#instructions").remove();
+  $("#viewcontainer").append(
+    `<p>Defend against the incoming blobs by placing turrets and flying your plane.
+    <br>Double click an empty tile to place a turret. Click on a turret to move it to an adjacent tile.
+    <br>Press SHIFT to toggle between building and flying.
+    <br>Use the mouse for changing directions and aiming. Left click to fire.
+    <br>Hold SPACE to slow down the plane. </p>`
   );
 };
 
