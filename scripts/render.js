@@ -54,7 +54,7 @@ audioListener = new THREE.AudioListener();
 reload = () => {
   menuScreen();
   appendGUI();
-  $(".dg").remove();
+  $(".dg").hide();
 };
 showSettings = displaySettings;
 startGame = () => {
@@ -185,7 +185,7 @@ function onPointerMove(event) {
       fighter.crosshairs.sprite.visible = false;
       const scalar = Math.sqrt(
         distSqFromCirc /
-        ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
+          ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
       );
       fighter.updateVelocity(
         pointer.clone().normalize().multiplyScalar(scalar)

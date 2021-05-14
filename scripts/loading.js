@@ -33,14 +33,14 @@ export const setVars = (
     mtlloader,
     objLoader,
   ] = [
-      ocontainer,
-      oloader,
-      oaudioLoader,
-      oaudioListener,
-      ocallback,
-      omtlloader,
-      oobjLoader,
-    ];
+    ocontainer,
+    oloader,
+    oaudioLoader,
+    oaudioListener,
+    ocallback,
+    omtlloader,
+    oobjLoader,
+  ];
 };
 
 export const loadWorld = () => {
@@ -63,7 +63,7 @@ export const loadWorld = () => {
           loadStar();
         },
         // called when loading is in progresses
-        function (xhr) { },
+        function (xhr) {},
         // called when loading has errors
         function (error) {
           console.log("An error occured while loading world");
@@ -71,7 +71,7 @@ export const loadWorld = () => {
       );
     },
     // called when loading is in progresses
-    function (xhr) { },
+    function (xhr) {},
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading world");
@@ -91,7 +91,7 @@ const loadStar = () => {
       loadPlane();
     },
     // called when loading is in progresses
-    function (xhr) { },
+    function (xhr) {},
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading stars");
@@ -113,7 +113,7 @@ const loadPlane = () => {
       loadTower();
     },
     // called when loading is in progresses
-    function (xhr) { },
+    function (xhr) {},
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading plane");
@@ -133,7 +133,7 @@ const loadTower = () => {
       loadTurret();
     },
     // called when loading is in progresses
-    function (xhr) { },
+    function (xhr) {},
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading tower");
@@ -154,7 +154,7 @@ const loadTurret = () => {
       loadTroop();
     },
     // called when loading is in progresses
-    function (xhr) { },
+    function (xhr) {},
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading turret");
@@ -175,7 +175,7 @@ const loadTroop = () => {
       loadShots();
     },
     // called when loading is in progresses
-    function (xhr) { },
+    function (xhr) {},
     // called when loading has errors
     function (error) {
       console.log("An error occured while loading troop");
@@ -256,74 +256,72 @@ showInstructions = () => {
 
 export const displaySettings = () => {
   container.append(info);
-  var gui = new dat.GUI();
 
-  // var options = {
-  //   togglePhase: function () {
-  //     stats.phase = stats.phase == "build" ? "flight" : "build";
-  //   },
-  // };
+  if ($(".dg").length == 0) {
+    var gui = new dat.GUI();
+    gui.add(settings, "LIVES").min(1).max(15).step(1).name("Lives").listen();
+    gui
+      .add(settings, "SPAWN_RATE")
+      .min(0)
+      .max(1)
+      .step(0.05)
+      .name("Spawn Rate")
+      .listen();
+    gui
+      .add(settings, "MAX_TURRETS")
+      .min(0)
+      .max(30)
+      .step(1)
+      .name("Max Turrets")
+      .listen();
+    gui
+      .add(settings, "ENEMY_SPEED")
+      .min(0)
+      .max(5)
+      .step(0.5)
+      .name("Enemy Speed")
+      .listen();
+    gui
+      .add(settings, "TURRET_RANGE")
+      .min(0)
+      .max(1000)
+      .step(50)
+      .name("Turret Range")
+      .listen();
+    gui
+      .add(settings, "TURRET_DAMAGE")
+      .min(0)
+      .max(200)
+      .step(10)
+      .name("Turret Damage")
+      .listen();
+    gui
+      .add(settings, "TURRET_FIRE_RATE")
+      .min(0.5)
+      .max(5)
+      .step(0.5)
+      .name("Fire Rate")
+      .listen();
+    gui
+      .add(settings, "PLANE_DAMAGE")
+      .min(0)
+      .max(200)
+      .step(25)
+      .name("Plane Damage")
+      .listen();
+    gui
+      .add(settings, "PLANE_MAX_SPEED")
+      .min(1)
+      .max(20)
+      .step(1)
+      .name("Plane Speed")
+      .listen();
+  }
 
-  gui.add(settings, "LIVES").min(1).max(15).step(1).name("Lives").listen();
-  gui
-    .add(settings, "SPAWN_RATE")
-    .min(0)
-    .max(1)
-    .step(0.05)
-    .name("Spawn Rate")
-    .listen();
-  gui
-    .add(settings, "MAX_TURRETS")
-    .min(0)
-    .max(30)
-    .step(1)
-    .name("Max Turrets")
-    .listen();
-  gui
-    .add(settings, "ENEMY_SPEED")
-    .min(0)
-    .max(5)
-    .step(0.5)
-    .name("Enemy Speed")
-    .listen();
-  gui
-    .add(settings, "TURRET_RANGE")
-    .min(0)
-    .max(1000)
-    .step(50)
-    .name("Turret Range")
-    .listen();
-  gui
-    .add(settings, "TURRET_DAMAGE")
-    .min(0)
-    .max(200)
-    .step(10)
-    .name("Turret Damage")
-    .listen();
-  gui
-    .add(settings, "TURRET_FIRE_RATE")
-    .min(0.5)
-    .max(5)
-    .step(0.5)
-    .name("Fire Rate")
-    .listen();
-  gui
-    .add(settings, "PLANE_DAMAGE")
-    .min(0)
-    .max(200)
-    .step(25)
-    .name("Plane Damage")
-    .listen();
-  gui
-    .add(settings, "PLANE_MAX_SPEED")
-    .min(1)
-    .max(20)
-    .step(1)
-    .name("Plane Speed")
-    .listen();
   $("#viewcontainer").empty();
   $("#viewcontainer").append(`<div id="optionContainer"></div>`);
   $("#optionContainer").append("<button onclick='reload()'>Save</button>");
+  $(".dg").show();
 };
 
 export const appendGUI = () => {
