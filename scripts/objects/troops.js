@@ -17,8 +17,8 @@ export class Troop {
   constructor(tile, time) {
     // copy troop mesh appearance
     this.mesh = new THREE.Group();
-    const sphere = new THREE.Mesh(Troop.geometry, Troop.material);
-    this.mesh.add(sphere);
+    this.sphere = new THREE.Mesh(Troop.geometry, Troop.material);
+    this.mesh.add(this.sphere);
     const model = Troop.troopModel.clone();
     model.position.set(0, 0, -6)
     this.mesh.add(model);

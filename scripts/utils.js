@@ -5,8 +5,8 @@ export const handleCollisions = (
   objects,
   scene,
   time,
-  blobMeshes,
-  idToEntity
+  blobSpheres,
+  idToBlob
 ) => {
   objects.forEach((object, index) => {
     if (object.type) {
@@ -14,10 +14,10 @@ export const handleCollisions = (
       if (object.type == "TURRET") {
         let target = null;
         let targetDist = object.range;
-        blobMeshes.forEach((mesh) => {
-          const dist = object.mesh.position.distanceTo(mesh.position);
+        blobSpheres.forEach((sphere) => {
+          const dist = object.mesh.position.distanceTo(sphere.getWorldPosition(new THREE.Vector3()));
           if (dist < targetDist) {
-            target = mesh;
+            target = sphere;
             targetDist = dist;
           }
           if (dist < Troop.range) {
@@ -25,14 +25,15 @@ export const handleCollisions = (
           }
         });
         if (target != null) {
-          const bullet = object.attemptFireBullet(target.position, time);
+          const pos = target.getWorldPosition(new THREE.Vector3());
+          const bullet = object.attemptFireBullet(pos, time);
           if (bullet) {
             objects.push(bullet);
             scene.add(bullet.mesh);
-            const explosion = new Explosion(target.position, target.position.clone().normalize(), time, false);
+            const explosion = new Explosion(pos, pos.clone().normalize(), time, false);
             objects.push(explosion);
             scene.add(explosion.mesh);
-            const blob = idToEntity.get(target.id);
+            const blob = idToBlob.get(target.id);
             blob.health -= object.damage;
           }
         }
@@ -41,9 +42,9 @@ export const handleCollisions = (
 
     // loses a life for each blob at tower
     if (object.type == "TOWER") {
-      blobMeshes.forEach((mesh) => {
-        const blob = idToEntity.get(mesh.id);
-        if (object.mesh.position.distanceTo(mesh.position) < Troop.range) {
+      blobSpheres.forEach((sphere) => {
+        const blob = idToBlob.get(sphere.id);
+        if (object.mesh.position.distanceTo(sphere.getWorldPosition(new THREE.Vector3())) < Troop.range) {
           stats.lives--;
           document.getElementById("lives").innerHTML = stats.lives;
           blob.health = -1;
@@ -65,8 +66,8 @@ export const handleCollisions = (
       }
       // if we remove a troop, increment score and add visual effect
       if (object.type == "TROOP") {
-        blobMeshes.splice(
-          blobMeshes.findIndex((e) => e.id == object.mesh.id),
+        blobSpheres.splice(
+          blobSpheres.findIndex((e) => e.id == object.sphere.id),
           1
         );
         stats.score += 1;
