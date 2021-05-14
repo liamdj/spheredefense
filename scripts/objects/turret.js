@@ -2,7 +2,7 @@ import { Bullet } from "./bullets.js";
 
 export class Turret {
   static timeOfHop = 0.0001 * 800;
-  static timeBetweenShots = 0.0001 * 2000 / settings.TURRET_FIRE_RATE;
+  static timeBetweenShots = (0.0001 * 2000) / settings.TURRET_FIRE_RATE;
   static turretModel = new THREE.Object3D();
   static shootSound = new THREE.Audio(new THREE.AudioListener());
   static placeSound = new THREE.Audio(new THREE.AudioListener());

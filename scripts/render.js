@@ -2,7 +2,7 @@ import { handleCollisions } from "./utils.js";
 import { Fighter } from "./objects/fighter.js";
 import { checkNewEnemy } from "./enemy.js";
 import { Turret } from "./objects/turret.js";
-import { Explosion } from "./objects/particles.js"
+import { Explosion } from "./objects/particles.js";
 import { Star } from "./objects/stars.js";
 import { TrackballControls } from "./lib/TrackBallControls.js";
 import { Board } from "./objects/board.js";
@@ -24,9 +24,9 @@ let perspectiveCamera,
   turretCount,
   fighter,
   tower,
-  blobMeshes,
+  blobSpheres,
   entities,
-  idToEntity,
+  idToBlobs,
   selectLines,
   selectFace,
   audioListener,
@@ -58,9 +58,9 @@ startGame = () => {
   meshPosition = board.mesh.geometry.attributes.position;
   fighter = new Fighter(width / height);
   tower = new Tower(board.tiles[0]);
-  blobMeshes = [];
+  blobSpheres = [];
   entities = [];
-  idToEntity = new Map();
+  idToBlobs = new Map();
   selectLines = new HoverLines();
   selectFace = new SelectFace();
   scene = new THREE.Scene();
@@ -132,6 +132,7 @@ function init() {
 
   document.getElementById("lives").innerHTML = stats.lives;
   document.getElementById("score").innerHTML = 0;
+  document.getElementById("turrets-remaining").innerHTML = settings.MAX_TURRETS;
 
   createControls(perspectiveCamera);
 
@@ -179,7 +180,7 @@ function onPointerMove(event) {
       fighter.crosshairs.sprite.visible = false;
       const scalar = Math.sqrt(
         distSqFromCirc /
-        ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
+          ((width / 2 - radius) ** 2 + (height / 2 - radius) ** 2)
       );
       fighter.updateVelocity(
         pointer.clone().normalize().multiplyScalar(scalar)
@@ -189,23 +190,32 @@ function onPointerMove(event) {
 }
 
 function onClick(event) {
-  if (stats.phase === "flight" && fighter.angularVel.x == 0 && fighter.angularVel.y == 0) {
+  if (
+    stats.phase === "flight" &&
+    fighter.angularVel.x == 0 &&
+    fighter.angularVel.y == 0
+  ) {
     Fighter.shootSound.play();
     raycaster.setFromCamera(pointer, fighter.camera);
 
-    const intersects = raycaster.intersectObjects([board.mesh, ...blobMeshes]);
-
+    const intersects = raycaster.intersectObjects([board.mesh, ...blobSpheres]);
 
     for (let inter of intersects) {
-      const entity = idToEntity.get(inter.object.id);
+      const entity = idToBlobs.get(inter.object.id);
 
       // remove blob hit
-      if (entity.type == "TROOP") {
+      if (entity) {
         entity.health -= Fighter.damage;
-        const explosion = new Explosion(inter.point, inter.point.clone().normalize(), lastTime, false);
+        const explosion = new Explosion(
+          inter.point,
+          inter.point.clone().normalize(),
+          lastTime,
+          false
+        );
         addEntity(explosion);
+      } else {
+        break;
       }
-      else { break; }
     }
 
     if (intersects.length > 0) {
@@ -384,7 +394,7 @@ function animate(timeMs) {
   }
   entities.forEach((obj) => {
     // skip the fighter if in build mode
-    if ((stats.phase !== "flight") && (obj == fighter)) return;
+    if (stats.phase !== "flight" && obj == fighter) return;
     obj.timeStep(time);
   });
 
@@ -395,9 +405,10 @@ function animate(timeMs) {
   const newTroop = checkNewEnemy(time, board.tiles);
   if (newTroop) {
     addEntity(newTroop);
-    blobMeshes.push(newTroop.mesh);
+    blobSpheres.push(newTroop.sphere);
+    idToBlobs.set(newTroop.sphere.id, newTroop);
   }
-  handleCollisions(entities, scene, time, blobMeshes, idToEntity);
+  handleCollisions(entities, scene, time, blobSpheres, idToBlobs);
   if ($("#turrets-remaining").length)
     $("#turrets-remaining").html(settings.MAX_TURRETS - turretCount);
 
@@ -407,7 +418,6 @@ function animate(timeMs) {
 }
 
 function addEntity(entity) {
-  idToEntity.set(entity.mesh.id, entity);
   entities.push(entity);
   scene.add(entity.mesh);
 }

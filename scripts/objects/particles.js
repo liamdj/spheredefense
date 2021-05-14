@@ -6,7 +6,9 @@ class Particle {
   });
 
   constructor(time, normal, large) {
-    this.mesh = large ? new THREE.Mesh(Particle.geometryL, Particle.material) : new THREE.Mesh(Particle.geometryS, Particle.material);
+    this.mesh = large
+      ? new THREE.Mesh(Particle.geometryL, Particle.material)
+      : new THREE.Mesh(Particle.geometryS, Particle.material);
     this.startTime = time;
     this.endTime = time + 0.0001 * 1000 * (1 + Math.random());
     this.direction = new THREE.Vector3().random().add(normal).normalize();
