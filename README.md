@@ -5,7 +5,7 @@
 In fulfillment of Princeton's COS 426 Final Project
 
 ## Demo
-Play the game at [https://nathanalam.github.io/spheredefense/](https://nathanalam.github.io/spheredefense/)
+Play the game at [https://liamdj.github.io/spheredefense/](https://liamdj.github.io/spheredefense/)
 
 ## Development
 Clone the repository and run the following commands to run the site locally:
