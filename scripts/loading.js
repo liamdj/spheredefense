@@ -239,7 +239,7 @@ export const menuScreen = () => {
     "<button onclick='showSettings()'>Settings</button>"
   );
   $("#viewcontainer").append(
-    `<a href="https://github.com/nathanalam/spheredefense">See it on Github</a>`
+    `<a href="https://github.com/liamdj/spheredefense">See it on Github</a>`
   );
 };
 
